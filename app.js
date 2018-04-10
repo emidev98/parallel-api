@@ -1,8 +1,25 @@
-const express = require('express');
-const endpoint = express();
+var express = require('express');
+var bodyParser = require("body-parser");
+var cors = require("cors");
+var app = express();
 
-endpoint.get('/', function(req, res){
-    res.send('Hello World!');
+
+var corsOptions = {
+  origin: 'http://localhost:4200',
+  optionsSuccessStatus: 200
+}
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+
+app.route('/api/v1/helloworld').get((req, res) => {
+    res.send({
+        type : "Hello",
+        to   : "World",
+    });
 });
 
-endpoint.listen(3000);
+app.listen(3000,function() {
+    console.log("API Running on port 3000");
+});
