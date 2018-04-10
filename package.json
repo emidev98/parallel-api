@@ -1,0 +1,24 @@
+{
+  "name": "paralelapi",
+  "version": "1.0.0",
+  "description": "Basic api created for ParalelSoftware with expressjs connected to mongodb",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/eharastasan/paralelAPI.git"
+  },
+  "author": "Emi Harastasan, Francesc Molins & Marc Sala",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gitlab.com/eharastasan/paralelAPI/issues"
+  },
+  "homepage": "https://gitlab.com/eharastasan/paralelAPI#README",
+  "dependencies": {
+    "express": "^4.16.3",
+    "lodash": "^4.17.5",
+    "mongodb": "^3.0.6",
+  }
+}
