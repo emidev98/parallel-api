@@ -4,11 +4,11 @@ This API consists to connect the front-end with REST API using JavaScript techno
 
 # Libraries and Frameworks Documentation
 
-- (ExpressJs)[https://expressjs.com]
-- (MongoDB Driver)[http://mongodb.github.io/node-mongodb-native/3.0/api/]
-- (Lodash)[https://lodash.com/docs/4.17.5]
+- [ExpressJs](https://expressjs.com)
+- [MongoDB Driver](http://mongodb.github.io/node-mongodb-native/3.0/api/)
+- [Lodash](https://lodash.com/docs/4.17.5)
 
 
 # Other util information
 
-- (Object oriented JavaScript)[https://www.sitepoint.com/object-oriented-javascript-deep-dive-es6-classes/]
+- [Object oriented JavaScript](https://www.sitepoint.com/object-oriented-javascript-deep-dive-es6-classes/)
