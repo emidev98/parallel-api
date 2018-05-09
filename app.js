@@ -5,7 +5,7 @@ var db = require('./db');
 var port = process.env.PORT || 4200;
 
 var corsOptions = {
-  origin: 'http://localhost:4200',
+  origin: 'http://52.232.103.21:4200',
   optionsSuccessStatus: 200
 };
 
