@@ -18,7 +18,7 @@ app.use(cors(corsOptions));
 
 
 //Testing
-app.use('/api/helloworld', HelloWorldController);
+app.use('/api/v1/helloworld', HelloWorldController);
 
 app.listen(port,function() {
     console.log("API Running on port 4200");
