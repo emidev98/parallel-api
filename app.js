@@ -2,7 +2,7 @@ var express = require('express');
 var cors = require("cors");
 var app = express();
 var db = require('./db');
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 4200;
 
 var corsOptions = {
   origin: 'http://localhost:4200',
@@ -18,8 +18,8 @@ app.use(cors(corsOptions));
 
 
 //Testing
-app.use('/helloworld', HelloWorldController);
+app.use('/api/helloworld', HelloWorldController);
 
 app.listen(port,function() {
-    console.log("API Running on port 3000");
+    console.log("API Running on port 4200");
 });
