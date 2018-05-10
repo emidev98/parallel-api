@@ -29,3 +29,4 @@ app.use('/api/v1/helloworld', HelloWorldController);
 // Create httpsServer with credential options and app variable
 var httpsServer = https.createServer(corsOptions, app);
 httpsServer.listen(port);
+console.log('Listening with https by port ' + port);
