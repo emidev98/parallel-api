@@ -4,11 +4,11 @@ var fs = require("fs");
 var cors = require("cors");
 var app = express();
 var db = require('./db');
-var port = process.env.PORT || 4200;
+var port = process.env.PORT || 443;
 
 var corsOptions = {
-    cert    : fs.readFileSync("/etc/letsencrypt/live/paralel.cf/fullchain.pem"),
-    key     : fs.readFileSync("/etc/letsencrypt/live/paralel.cf/privkey.pem"),
+    cert    : fs.readFileSync("/etc/letsencrypt/live/paralelapi.westeurope.cloudapp.azure.com/fullchain.pem"),
+    key     : fs.readFileSync("/etc/letsencrypt/live/paralelapi.westeurope.cloudapp.azure.com/privkey.pem"),
     origin  : '*',
     optionsSuccessStatus: 200
 };
