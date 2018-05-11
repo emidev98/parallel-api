@@ -1,15 +1,51 @@
-// User.js
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var conn      = mongoose.createConnection('mongodb://localhost/testA');
 
-// Creem un schema (blueprint) per representar el usuari de la BD.
-var UserSchema = new mongoose.Schema({
-    name: String,
-    email: String,
+var AccountsSchema = new Schema({
+    _id: Number,
+    title: String,
+    image: String,
+    description: String,
+    user: String,
     password: String
 });
 
-// Conectem el model de User amb el schema que hem creat
-mongoose.model('User', UserSchema);
+var AccountGroupsSchema = new Schema({
+    _id: Number,
+    image: String,
+    name: {type: String, unique: true},
+    accounts: [AccountsSchema]
+});
 
-//Exportem el model perque sigui visible
+var SessionsSchema = new Schema({
+    ip: String,
+    location: String,
+    browser: String,
+    os: String,
+    date: Date
+})
+
+var UsersSchema = new Schema({
+    publickey: {type: String, unique: true},
+    image: String,
+    name: String,
+    lastname: String,
+    email: {type: String, unique: true},
+    password: String,
+    language: String,
+    accountgroups: [AccountGroupsSchema],
+    sessions: [SessionsSchema]
+}, { collection :  'test' });
+
+UsersSchema.methods.maxAccountGrpId = function(){
+    return this.accountgroups.length + 1;
+}
+
+UsersSchema.methods.maxAccountId = function(accountGrpId) {
+    return this.accountgroups[accountGrpId - 1].accounts.length;
+}
+
+module.exports = conn.model('User', UsersSchema);
+
 module.exports = mongoose.model('User');
