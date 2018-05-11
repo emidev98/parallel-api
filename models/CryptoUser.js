@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var ObjectId = mongoose.Schema.Types.ObjectId;
-var conn2     = mongoose.createConnection('mongodb://localhost/testB');
+var conn2     = mongoose.createConnection('mongodb://localhost/cryptousers');
 
 var CryptoUsersSchema = new Schema({
     userid: ObjectId,
