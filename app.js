@@ -1,12 +1,14 @@
-var express = require('express');
-var forceSSL = require("express-force-ssl");
-var fs = require("fs");
-var cors = require("cors");
-var https = require('https');
-var app = express();
-var db = require('./db');
-var port = process.env.PORT || 8443;
+var express         = require('express');
+var forceSSL        = require("express-force-ssl");
+var bodyParser      = require('body-parser');
+var fs              = require("fs");
+var cors            = require("cors");
+var https           = require('https');
+var Middlewares     = require('./middlewares/middlewares');
+var db              = require('./db');
+var app             = express();
 
+var port = process.env.PORT || 8443; //Create port variable
 var corsOptions = {
     cert    : fs.readFileSync("/etc/letsencrypt/live/paralelapi.westeurope.cloudapp.azure.com/fullchain.pem"),
     key     : fs.readFileSync("/etc/letsencrypt/live/paralelapi.westeurope.cloudapp.azure.com/privkey.pem"),
@@ -14,17 +16,20 @@ var corsOptions = {
     optionsSuccessStatus: 200
 };
 
-var UserController = require('./controllers/UserController');
-var HelloWorldController = require('./controllers/HelloWorldController')
+// Using bodyParser to get json body
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
+// Using forceSSL to conect via HTTPS
 app.use(forceSSL);
 app.use(cors(corsOptions));
 
-//app.use('/users', UserController);
+// Middlewares
+app.use(Middlewares.replaceUrl);
 
-
-//Testing
-app.use('/api/v1/helloworld', HelloWorldController);
+// Call routes function
+var routes = require('./routes/routes');
+routes(app);
 
 // Create httpsServer with credential options and app variable
 var httpsServer = https.createServer(corsOptions, app);
