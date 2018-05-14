@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var conn      = mongoose.createConnection('mongodb://localhost/testA');
+var mongoose  = require('mongoose');
+var Schema    = mongoose.Schema;
+var conn      = mongoose.createConnection('mongodb://readerWritterUsersTable:ParalelUsersDbRandW@localhost/users?authSource=users');
 
 var AccountsSchema = new Schema({
     _id: Number,
@@ -36,7 +36,7 @@ var UsersSchema = new Schema({
     language: String,
     accountgroups: [AccountGroupsSchema],
     sessions: [SessionsSchema]
-}, { collection :  'test' });
+}, { collection :  'users' });
 
 UsersSchema.methods.maxAccountGrpId = function(){
     return this.accountgroups.length + 1;
@@ -47,5 +47,3 @@ UsersSchema.methods.maxAccountId = function(accountGrpId) {
 }
 
 module.exports = conn.model('User', UsersSchema);
-
-module.exports = mongoose.model('User');

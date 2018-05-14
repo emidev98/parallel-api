@@ -4,4 +4,4 @@
 var mongoose = require('mongoose');
 
 //Ens conactem a la BD, en aquest cas està hostejada a mLab
-mongoose.connect('mongodb://localhost/helloworld')
+mongoose.connect('mongodb://helloworldUser:ParalelHelloWorld@localhost/helloworld')
