@@ -47,7 +47,7 @@ user.save(function (err, user) {
     console.log("guardat");
 });
 
-/*var millisecondsToWait = 500;
+var millisecondsToWait = 500;
 setTimeout(function() {
     User.findOne({email: "test@test.test"},function (err, user2) {
       if (err) return console.error(err);
