@@ -5,6 +5,7 @@ module.exports = function(app){
     ******************/
 
     var helloWorld = require('../controllers/HelloWorldController');
+    var User = require('../controllers/UserController');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -14,6 +15,16 @@ module.exports = function(app){
         helloWorld.getHelloWorld(function(err, helloWorld){
             if(err) return res.status(500).send("There was a problem finding the users.");
             res.status(200).send(helloWorld[0]);
+        });
+    });
+
+    /******************
+    * USERS ROUTES ****
+    ******************/
+
+    app.post('/register', function(req, res){
+        User.register(req, function(err, user){
+            if(err) return res.status(err.status).send(err.message);
         });
     });
 }
