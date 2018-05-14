@@ -1,5 +1,5 @@
 var User = require('../models/User');
-var CryptoUser = require('../model/CryptoUser');
+var CryptoUser = require('../models/CryptoUser');
 
 var user = new User(
     {
