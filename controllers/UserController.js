@@ -108,12 +108,12 @@ function saveNewUser(user, privkey){
 				userid: savedUser._id,
 				privatekey: privkey,
 			}
-			CryptoUser.create(newCryptoUser, function(err, cryptoUser)){
+			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
 				if(err){
 					return reject(err);
 				}
 				resolve(savedUser);
-			}
+			});
 		});
 	});
 }
