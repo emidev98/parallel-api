@@ -53,7 +53,7 @@ module.exports.register = function(user, callback){
 function checkNewUserEmail(user){
 	return new Promise(function(resolve, reject) {
 		User.find({
-			email: user.email;
+			email: user.email
 		}, function(err, users){
 			if(err) {
 				return reject(err);
@@ -92,7 +92,7 @@ function createKeyPair(user){
 		};
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publickey = key.publicKeyArmored;
-			var privkey = key.privateKeyArmored
+			var privkey = key.privateKeyArmored;
 			resolve(privkey);
 		});
 	});
@@ -105,8 +105,8 @@ function saveNewUser(user, privkey){
 				return reject(err);
 			}
 			var newCryptoUser = {
-				userid: savedUser._id;
-				privatekey: privkey;
+				userid: savedUser._id,
+				privatekey: privkey,
 			}
 			CryptoUser.create(newCryptoUser, function(err, cryptoUser)){
 				if(err){
