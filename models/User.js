@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var conn      = mongoose.createConnection('mongodb://localhost/users');
+var mongoose  = require('mongoose');
+var Schema    = mongoose.Schema;
+var conn      = mongoose.createConnection('mongodb://readerWritterUsersTable:ParalelUsersDbRandW@localhost/users?authSource=users');
 
 var AccountsSchema = new Schema({
     _id: Number,
