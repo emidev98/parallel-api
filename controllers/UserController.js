@@ -41,7 +41,9 @@ module.exports.register = function(user, callback){
 	checkNewUserEmail(user)
 	.then(createHash(user)
 		.then(createKeyPair(user)
-			.then(privkey => saveNewUser(user, privkey))
+			.then(privkey => saveNewUser(user, privkey)
+				.then(savedUser => callback(null, savedUser))
+			)
 		)
 	)
 	.catch(err => callback(err, undefined))
@@ -110,7 +112,7 @@ function saveNewUser(user, privkey){
 				if(err){
 					return reject(err);
 				}
-				resolve();
+				resolve(savedUser);
 			}
 		});
 	});
