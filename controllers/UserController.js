@@ -86,8 +86,8 @@ function createHash(user){
 function createKeyPair(user){
 	return new Promise(function(resolve, reject) {
 		var keyOption = {
-			userIds = [{name: user.firstName, email: user.email}],
-			passphrase = user.password,
+			userIds: [{name: user.firstName, email: user.email}],
+			passphrase: user.password,
 			numBits: 4096
 		};
 		openpgp.generateKey(keyOption).then(function(key){
