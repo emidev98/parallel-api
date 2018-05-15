@@ -3,6 +3,8 @@ var User 		= require('../models/User');
 var CryptoUser 	= require('../models/CryptoUser');
 var bcrypt  	= require('bcrypt');
 var openpgp 	= require('openpgp');
+var CustomError = require('../errors/CustomError');
+var errorCodes  = require('../errors/errorCodes');
 openpgp.initWorker({ path:'openpgp.worker.js' });
 var saltRounds = 10;
 
@@ -23,13 +25,21 @@ function checkNewUserEmail(user){
 			email: user.email
 		}, function(err, users){
 			if(err) {
-				return reject(err);
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "INTERNAL_ERROR"
+                }
+				var error = new CustomError(errorInfo);
+				return reject(error);
 			}
 			if(users.length > 0){
-				//TODO: S'ha de mirar de fer-ho millor
-				var userFindError = new Error();
-				userFindError.status = 500;
-				userFindError.message = "This user alredy exists";
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.DUPLICATED_USER,
+                    errorKey : "DUPLICATED_USER"
+                }
+				var userFindError = new CustomError(errorInfo);
 				return reject(userFindError);
 			}
 			resolve(user);
@@ -42,7 +52,13 @@ function createHash(user){
 		var plainHash = user.password + user.email.split("@", 1)[0];
 		bcrypt.hash(plainHash, saltRounds, function(err, hash){
 			if(err){
-				return reject(err);
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "INTERNAL_ERROR"
+                }
+				var error = new CustomError(errorInfo);
+				return reject(error);
 			}
 			user.password = hash;
 			resolve(user);
@@ -70,7 +86,13 @@ function saveNewUser(user, privkey){
 	return new Promise(function(resolve, reject) {
 		User.create(user, function(err, savedUser){
 			if(err){
-				return reject(err);
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "INTERNAL_ERROR"
+                }
+				var error = new CustomError(errorInfo);
+				return reject(error);
 			}
 			var newCryptoUser = {
 				userid: savedUser._id,
@@ -78,7 +100,13 @@ function saveNewUser(user, privkey){
 			}
 			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
 				if(err){
-					return reject(err);
+                    var errorInfo = {
+                        status : 500,
+                        errorCode : errorCodes.INTERNAL_ERROR,
+                        errorKey : "INTERNAL_ERROR"
+                    }
+    				var error = new CustomError(errorInfo);
+    				return reject(error);
 				}
 				resolve(savedUser);
 			});

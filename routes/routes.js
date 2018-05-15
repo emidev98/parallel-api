@@ -22,9 +22,16 @@ module.exports = function(app){
     * USERS ROUTES ****
     ******************/
 
-    app.post('/register', function(req, res){
+    app.put('/register', function(req, res){
         User.register(req.body, function(err, user){
-            if(err) return res.status(err.status).send(err.message);
+            if(err){
+                res.status(err.status);
+                var errorStatus = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(errorStatus);
+            }
             var responseObject = {
                 token : user._id,
                 language : user.language,
