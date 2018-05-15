@@ -2,5 +2,5 @@ module.exports = {
     DUPLICATED_USER: 100,
     INCORRECT_USER_OR_PASSWORD: 200,
     INVALID_TOKEN: 300,
-    
+
 }
