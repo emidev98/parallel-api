@@ -74,7 +74,7 @@ function createKeyPair(user){
 			curve: "p256"
 		};
 		openpgp.generateKey(keyOption).then(function(key){
-			user.publickey = key.publicKeyArmored;
+			user.publicKey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;
             var resolveReturn = [user, privkey];
 			resolve(resolveReturn);

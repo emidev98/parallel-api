@@ -27,15 +27,15 @@ var SessionsSchema = new Schema({
 })
 
 var UsersSchema = new Schema({
-    publickey: {type: String, unique: true},
+    publicKey: {type: String, unique: true},
     image: String,
-    firstname: String,
-    lastname: String,
+    firstName: String,
+    lastName: String,
     email: {type: String, unique: true},
     age: Number,
     password: String,
     language: {type: String, default: "ES"},
-    accountgroups: [AccountGroupsSchema],
+    accountGroups: [AccountGroupsSchema],
     sessions: [SessionsSchema]
 }, { collection :  'users' });
 
