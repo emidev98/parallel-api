@@ -1,8 +1,7 @@
 
 module.exports = function CustomError(error) {
   Error.captureStackTrace(this, this.constructor);
-  this.name = this.constructor.name;
-  this.status = error.extra;
+  this.status = error.status;
   this.errorCode = error.errorCode;
   this.errorKey = error.errorKey;
 };

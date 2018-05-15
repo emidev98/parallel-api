@@ -1,6 +1,6 @@
 module.exports = {
+    INTERNAL_ERROR: 0,
     DUPLICATED_USER: 100,
     INCORRECT_USER_OR_PASSWORD: 200,
     INVALID_TOKEN: 300,
-
 }
