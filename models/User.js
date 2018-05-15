@@ -14,7 +14,7 @@ var AccountsSchema = new Schema({
 var AccountGroupsSchema = new Schema({
     _id: Number,
     image: String,
-    name: {type: String, unique: true},
+    name: String, 
     accounts: [AccountsSchema]
 });
 
