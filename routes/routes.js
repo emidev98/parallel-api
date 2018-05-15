@@ -37,8 +37,8 @@ module.exports = function(app){
                 language : user.language,
                 email : user.email,
                 age : user.age,
-                firstname : user.firstName,
-                lastname : user.lastName,
+                firstName : user.firstName,
+                lastName : user.lastName,
             }
             res.status(200).send(responseObject);
         });

@@ -95,8 +95,8 @@ function saveNewUser(user, privkey){
 				return reject(error);
 			}
 			var newCryptoUser = {
-				userid: savedUser._id,
-				privatekey: privkey,
+				userId: savedUser._id,
+				privateKey: privkey,
 			}
 			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
 				if(err){
