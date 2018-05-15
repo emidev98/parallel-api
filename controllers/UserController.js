@@ -3,55 +3,21 @@ var User 		= require('../models/User');
 var CryptoUser 	= require('../models/CryptoUser');
 var bcrypt  	= require('bcrypt');
 var openpgp 	= require('openpgp');
-
+openpgp.initWorker({ path:'openpgp.worker.js' });
 var saltRounds = 10;
 
-// module.exports.register = function(user, callback){
-// 	User.find({
-// 		email: user.email;
-// 	}, function(err, users){	//<-- DONE
-// 		if(users.length > 0){
-// 			//TODO: S'ha de mirar de fer-ho millor
-// 			var err = new Error();
-// 			err.status = 500;
-// 			err.message = "This user alredy exists";
-// 			callback(err, undefined);
-// 		} else {
-// 			var plainHash = user.password + user.email.split("@", 1)[0];
-// 			bcrypt.hash(plainHash, saltRounds).then(function(hash)){ //<-- DONE
-// 				user.password = hash;
-// 				var keyOption = {
-// 					userIds = [{name: user.firstName, email: user.email}],
-// 					passphrase = user.password,
-// 					numBits: 4096
-// 				};
-// 				openpgp.generateKey(keyOptions).then(function(key){ //<--
-// 					var privkey = key.privateKeyArmored;
-// 					user.publickey = key.publicKeyArmored;
-// 					User.create(user, function(err, user){
-// 						if(err) callback(err, user);
-// 					});
-// 				});
-// 			});
-// 		}
-// 	});
-// }
-
 module.exports.register = function(user, callback){
-	checkNewUserEmail(user)
-	.then(createHash(user)
-		.then(createKeyPair(user)
-			.then(privkey => saveNewUser(user, privkey)
-				.then(savedUser => callback(null, savedUser))
-			)
-		)
-	)
-	.catch(err => callback(err, undefined))
+    var USER = 0;
+    var PRIVKEY = 1;
+    checkNewUserEmail(user)
+    .then(user => createHash(user))
+    .then(user => createKeyPair(user))
+ 	.then(resolveReturn => saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+    .then(savedUser => callback(null, savedUser))
+    .catch(err => callback(err, undefined))
 }
 
-
 function checkNewUserEmail(user){
-	console.log("Check new user email");
 	return new Promise(function(resolve, reject) {
 		User.find({
 			email: user.email
@@ -66,14 +32,12 @@ function checkNewUserEmail(user){
 				userFindError.message = "This user alredy exists";
 				return reject(userFindError);
 			}
-			console.log("Checked new user email");
-			resolve();
+			resolve(user);
 		})
 	})
 }
 
 function createHash(user){
-	console.log("Create Hash");
 	return new Promise(function(resolve, reject) {
 		var plainHash = user.password + user.email.split("@", 1)[0];
 		bcrypt.hash(plainHash, saltRounds, function(err, hash){
@@ -81,31 +45,28 @@ function createHash(user){
 				return reject(err);
 			}
 			user.password = hash;
-			console.log("Created Hash");
-			resolve();
+			resolve(user);
 		});
 	});
 }
 
 function createKeyPair(user){
-	console.log("Create key pair");
 	return new Promise(function(resolve, reject) {
 		var keyOption = {
 			userIds: [{name: user.firstName, email: user.email}],
 			passphrase: user.password,
-			numBits: 4096
+			curve: "p256"
 		};
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publickey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;
-			console.log("Created key pair");
-			resolve(privkey);
+            var resolveReturn = [user, privkey];
+			resolve(resolveReturn);
 		});
 	});
 }
 
 function saveNewUser(user, privkey){
-	console.log("save new user");
 	return new Promise(function(resolve, reject) {
 		User.create(user, function(err, savedUser){
 			if(err){
@@ -119,7 +80,6 @@ function saveNewUser(user, privkey){
 				if(err){
 					return reject(err);
 				}
-				console.log("saved new user");
 				resolve(savedUser);
 			});
 		});

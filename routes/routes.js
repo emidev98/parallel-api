@@ -23,8 +23,17 @@ module.exports = function(app){
     ******************/
 
     app.post('/register', function(req, res){
-        User.register(req, function(err, user){
+        User.register(req.body, function(err, user){
             if(err) return res.status(err.status).send(err.message);
+            var responseObject = {
+                token : user._id,
+                language : user.language,
+                email : user.email,
+                age : user.age,
+                firstname : user.firstname,
+                lastname : user.lastname,
+            }
+            res.status(200).send(responseObject);
         });
     });
 }
