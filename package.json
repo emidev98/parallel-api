@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/eharastasan/paralelAPI#README",
   "dependencies": {
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.3",
@@ -25,6 +26,7 @@
     "https": "^1.0.0",
     "lodash": "^4.17.5",
     "mongodb": "^3.0.6",
-    "mongoose": "^5.0.17"
+    "mongoose": "^5.0.17",
+    "openpgp": "^3.0.9"
   }
 }

@@ -29,9 +29,10 @@ var SessionsSchema = new Schema({
 var UsersSchema = new Schema({
     publickey: {type: String, unique: true},
     image: String,
-    name: String,
+    firstname: String,
     lastname: String,
     email: {type: String, unique: true},
+    age: Number,
     password: String,
     language: {type: String, default: "ES"},
     accountgroups: [AccountGroupsSchema],

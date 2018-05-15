@@ -17,6 +17,34 @@ module.exports = function(app){
             res.status(200).send(helloWorld[0]);
         });
     });
+
+    /******************
+    * USERS ROUTES ****
+    ******************/
+
+    app.put('/register', function(req, res){
+        User.register(req.body, function(err, user){
+            if(err){
+                res.status(err.status);
+                var errorStatus = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(errorStatus);
+            }
+            var responseObject = {
+                token : user._id,
+                language : user.language,
+                email : user.email,
+                age : user.age,
+                firstname : user.firstname,
+                lastname : user.lastname,
+            }
+            res.status(200).send(responseObject);
+        });
+    });
+
+
     app.post('/login', function(req, res){
         User.login(req.body, function(err, userDB){
             if (err) {
@@ -34,6 +62,5 @@ module.exports = function(app){
                 lastname: userDB.lastname
             }
             res.status(200).send(returnUser);
-        })
-    });
+        });
 }
