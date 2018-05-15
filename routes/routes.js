@@ -16,4 +16,7 @@ module.exports = function(app){
             res.status(200).send(helloWorld[0]);
         });
     });
+    app.get('/login', function(req, res){
+        
+    });
 }
