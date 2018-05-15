@@ -33,7 +33,7 @@ var UsersSchema = new Schema({
     lastname: String,
     email: {type: String, unique: true},
     password: String,
-    language: String,
+    language: {type: String, default: "ES"},
     accountgroups: [AccountGroupsSchema],
     sessions: [SessionsSchema]
 }, { collection :  'users' });
