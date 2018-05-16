@@ -24,8 +24,8 @@ module.exports.isLogged = function(authentication, callback){
         if(user === null){
             var errorInfo = {
                 status : 500,
-                errorCode : errorCodes.INVALID_TOKEN,
-                errorKey : "ERRORS.INVALID_TOKEN"
+                errorCode : errorCodes.INCORRECT_TOKEN,
+                errorKey : "ERRORS.INCORRECT_TOKEN"
             }
             var error = new CustomError(errorInfo);
             callback(error, undefined);
@@ -177,7 +177,7 @@ function checkUserEmail(user){
 				var error = {
 					status: 404,
 					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-					errorKey: "ERRORS.INVALID_USER_OR_PASSWORD"
+					errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
 				};
 				var userNotFoundError = new CustomError(error);
 				return reject(userNotFoundError);
