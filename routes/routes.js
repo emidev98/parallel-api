@@ -32,7 +32,7 @@ module.exports = function(app){
                 return res.status(err.status).send(errorStatus);
             }
             var responseObject = {
-                token : user._id,
+                token : user.token,
                 language : user.language,
                 email : user.email,
                 firstName : user.firstName,
@@ -53,7 +53,7 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var returnUser = {
-                token: userDB._id,
+                token: userDB.token,
                 language: userDB.language,
                 email: userDB.email,
                 firstName: userDB.firstName,

@@ -6,6 +6,7 @@ var openpgp 	= require('openpgp');
 var CustomError = require('../errors/CustomError');
 var errorCodes  = require('../errors/errorCodes');
 var fs          = require("fs");
+var randtoken   = require('rand-token');
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
@@ -13,25 +14,27 @@ var saltRounds = 10;
 
 module.exports.isLogged = function(authentication, callback){
     User.findOne({
-        _id: authentication
+        token: authentication
     }, function(err, user){
         if(err) {
+            console.log(err)
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INTERNAL_ERROR,
                 errorKey : "ERRORS.INTERNAL_ERROR"
             }
             var error = new CustomError(errorInfo);
-            callback(error, undefined);
+            return callback(error, undefined);
         }
         if(user === null){
+            console.log(err)
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INCORRECT_TOKEN,
                 errorKey : "ERRORS.INCORRECT_TOKEN"
             }
             var error = new CustomError(errorInfo);
-            callback(error, undefined);
+            return callback(error, undefined);
         }
         else callback(null, user);
     })
@@ -47,7 +50,7 @@ module.exports.register = function(user, callback){
             errorKey : "ERRORS.PASSWORD_DO_NOT_MATCH"
         }
         var error = new CustomError(errorInfo);
-        callback(error, undefined);
+        return callback(error, undefined);
     }
     checkNewUserEmail(user)
     .then(user => createHash(user))
@@ -135,12 +138,9 @@ function saveNewUser(user, privkey){
 				var error = new CustomError(errorInfo);
 				return reject(error);
 			}
-			var newCryptoUser = {
-				userId: savedUser._id,
-				privateKey: privkey,
-			}
-			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
-				if(err){
+            savedUser.token = randtoken.generate(16);
+            savedUser.save(function(err, savedUserWithToken) {
+                if(err){
                     var errorInfo = {
                         status : 500,
                         errorCode : errorCodes.INTERNAL_ERROR,
@@ -148,9 +148,24 @@ function saveNewUser(user, privkey){
                     }
     				var error = new CustomError(errorInfo);
     				return reject(error);
-				}
-				resolve(savedUser);
-			});
+    			}
+                var newCryptoUser = {
+    				userId: savedUser._id,
+    				privateKey: privkey,
+    			}
+    			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
+    				if(err){
+                        var errorInfo = {
+                            status : 500,
+                            errorCode : errorCodes.INTERNAL_ERROR,
+                            errorKey : "ERRORS.INTERNAL_ERROR"
+                        }
+        				var error = new CustomError(errorInfo);
+        				return reject(error);
+    				}
+    				resolve(savedUser);
+    			});
+            })
 		});
 	});
 }

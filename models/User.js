@@ -28,6 +28,7 @@ var SessionsSchema = new Schema({
 
 var UsersSchema = new Schema({
     publicKey: {type: String, unique: true},
+    token: String,
     image: String,
     firstName: String,
     lastName: String,
