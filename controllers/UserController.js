@@ -60,6 +60,7 @@ function createHash(user){
 				var error = new CustomError(errorInfo);
 				return reject(error);
 			}
+            console.log(hash);
 			user.password = hash;
 			resolve(user);
 		});
@@ -116,7 +117,6 @@ function saveNewUser(user, privkey){
 
 
 module.exports.login = function (user, callback){
-	console.log(user.email);
 	checkUserEmail(user)
 		.then(users => compareHash(users))
 		.then(userDB => callback(null, userDB))
@@ -128,7 +128,16 @@ function checkUserEmail(user){
 		var userDB = User.findOne({
 			email: user.email
 		}, function (err, userDB){
-			if (err) callback(err, undefined);
+            if(err) {
+                console.log(err);
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "INTERNAL_ERROR"
+                }
+				var error = new CustomError(errorInfo);
+				return reject(error);
+			}
 			if (!userDB){
 				var error = {
 					status: 404,
@@ -148,9 +157,18 @@ function compareHash(users){
 	var USER_FRONT_END = 0;
 	var USER_DB = 1;
 	return new Promise(function (resolve, reject){
-		bcrypt.compare(users[USER_FRONT_END].password, users[USER_DB].password, function(err, res) {
-			if (err) callback(err, undefined);
+        bcrypt.compare(users[USER_FRONT_END].password + users[USER_FRONT_END].email.split("@", 1)[0], users[USER_DB].password, function(err, res) {
+            if(err) {
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "INTERNAL_ERROR"
+                }
+				var error = new CustomError(errorInfo);
+				return reject(error);
+			}
 			if (!res){
+                console.log(res);
 				var error = {
 					status: 404,
 					errorCode: errorCodes.INVALID_USER_OR_PASSWORD,
@@ -159,7 +177,8 @@ function compareHash(users){
 				var passwordNotMatchError = new CustomError(error);
 				return reject(passwordNotMatchError);
 			}
+            console.log("Before resolve");
 			resolve(users[USER_DB]);
-		})
-	})
+		});
+    })
 }
