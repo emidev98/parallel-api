@@ -141,7 +141,7 @@ function checkUserEmail(user){
 			if (!userDB){
 				var error = {
 					status: 404,
-					errorCode: errorCodes.INVALID_USER_OR_PASSWORD,
+					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
 					errorKey: "INVALID_USER_OR_PASSWORD"
 				};
 				var userNotFoundError = new CustomError(error);
@@ -171,8 +171,8 @@ function compareHash(users){
                 console.log(res);
 				var error = {
 					status: 404,
-					errorCode: errorCodes.INVALID_USER_OR_PASSWORD,
-					errorKey: "INVALID_USER_OR_PASSWORD"
+					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
+					errorKey: "INCORRECT_USER_OR_PASSWORD"
 				};
 				var passwordNotMatchError = new CustomError(error);
 				return reject(passwordNotMatchError);
