@@ -27,6 +27,7 @@
     "lodash": "^4.17.5",
     "mongodb": "^3.0.6",
     "mongoose": "^5.0.17",
-    "openpgp": "^3.0.9"
+    "openpgp": "^3.0.9",
+    "underscore": "^1.9.0"
   }
 }
