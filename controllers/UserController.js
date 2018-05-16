@@ -5,6 +5,9 @@ var bcrypt  	= require('bcrypt');
 var openpgp 	= require('openpgp');
 var CustomError = require('../errors/CustomError');
 var errorCodes  = require('../errors/errorCodes');
+var fs          = require("fs");
+
+
 openpgp.initWorker({ path:'openpgp.worker.js' });
 var saltRounds = 10;
 
@@ -114,7 +117,9 @@ function createKeyPair(user){
 			var privkey = key.privateKeyArmored;
             var resolveReturn = [user, privkey];
 			resolve(resolveReturn);
-		});
+		}).catch(function(err){
+            console.log(err);
+        });
 	});
 }
 

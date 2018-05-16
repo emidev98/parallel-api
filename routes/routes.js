@@ -25,7 +25,6 @@ module.exports = function(app){
     app.put('/register', function(req, res){
         User.register(req.body, function(err, user){
             if(err){
-                res.status(err.status);
                 var errorStatus = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey

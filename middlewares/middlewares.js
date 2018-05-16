@@ -14,7 +14,6 @@ module.exports.hasAccess = function(req, res, next){
     } else {
 		User.isLogged(req.get('Authentication'), function(err, user){
 			if(err){
-				res.status(err.status);
 				var errorStatus = {
 					errorCode: err.errorCode,
 					errorKey: err.errorKey
