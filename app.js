@@ -26,6 +26,7 @@ app.use(cors(corsOptions));
 
 // Middlewares
 app.use(Middlewares.replaceUrl);
+app.use(Middlewares.hasAccess);
 
 // Call routes function
 var routes = require('./routes/routes');

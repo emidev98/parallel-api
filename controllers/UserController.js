@@ -8,6 +8,32 @@ var errorCodes  = require('../errors/errorCodes');
 openpgp.initWorker({ path:'openpgp.worker.js' });
 var saltRounds = 10;
 
+module.exports.isLogged = function(authentication, callback){
+    User.findOne({
+        _id: authentication
+    }, function(err, user){
+        if(err) {
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            callback(error, undefined);
+        }
+        if(user === null){
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INVALID_TOKEN,
+                errorKey : "INVALID_TOKEN"
+            }
+            var error = new CustomError(errorInfo);
+            callback(error, undefined);
+        }
+        else callback(null, user);
+    })
+}
+
 module.exports.register = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
