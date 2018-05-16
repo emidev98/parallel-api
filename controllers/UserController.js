@@ -40,8 +40,8 @@ module.exports.register = function(user, callback){
     if(user.password.toString() != user.repeatPassword.toString()){
         var errorInfo = {
             status : 500,
-            errorCode : errorCodes.PASSWORD_DONT_MATCH,
-            errorKey : "PASSWORD_DONT_MATCH"
+            errorCode : errorCodes.PASSWORD_DO_NOT_MATCH,
+            errorKey : "PASSWORD_DO_NOT_MATCH"
         }
         var error = new CustomError(errorInfo);
         callback(error, undefined);
