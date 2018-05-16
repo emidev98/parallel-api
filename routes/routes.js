@@ -58,8 +58,8 @@ module.exports = function(app){
                 token: userDB._id,
                 language: userDB.language,
                 email: userDB.email,
-                firstname: userDB.firstname,
-                lastname: userDB.lastname
+                firstName: userDB.firstName,
+                lastName: userDB.lastName
             }
             res.status(200).send(returnUser);
         });
