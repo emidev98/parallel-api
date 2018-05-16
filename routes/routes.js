@@ -36,7 +36,6 @@ module.exports = function(app){
                 token : user._id,
                 language : user.language,
                 email : user.email,
-                age : user.age,
                 firstName : user.firstName,
                 lastName : user.lastName,
             }
