@@ -16,7 +16,7 @@ module.exports.isLogged = function(authentication, callback){
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "INTERNAL_ERROR"
+                errorKey : "ERRORS.INTERNAL_ERROR"
             }
             var error = new CustomError(errorInfo);
             callback(error, undefined);
@@ -25,7 +25,7 @@ module.exports.isLogged = function(authentication, callback){
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INVALID_TOKEN,
-                errorKey : "INVALID_TOKEN"
+                errorKey : "ERRORS.INVALID_TOKEN"
             }
             var error = new CustomError(errorInfo);
             callback(error, undefined);
@@ -41,7 +41,7 @@ module.exports.register = function(user, callback){
         var errorInfo = {
             status : 500,
             errorCode : errorCodes.PASSWORD_DO_NOT_MATCH,
-            errorKey : "PASSWORD_DO_NOT_MATCH"
+            errorKey : "ERRORS.PASSWORD_DO_NOT_MATCH"
         }
         var error = new CustomError(errorInfo);
         callback(error, undefined);
@@ -63,7 +63,7 @@ function checkNewUserEmail(user){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "INTERNAL_ERROR"
+                    errorKey : "ERRORS.INTERNAL_ERROR"
                 }
 				var error = new CustomError(errorInfo);
 				return reject(error);
@@ -72,7 +72,7 @@ function checkNewUserEmail(user){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.DUPLICATED_USER,
-                    errorKey : "DUPLICATED_USER"
+                    errorKey : "ERRORS.DUPLICATED_USER"
                 }
 				var userFindError = new CustomError(errorInfo);
 				return reject(userFindError);
@@ -90,7 +90,7 @@ function createHash(user){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "INTERNAL_ERROR"
+                    errorKey : "ERRORS.INTERNAL_ERROR"
                 }
 				var error = new CustomError(errorInfo);
 				return reject(error);
@@ -125,7 +125,7 @@ function saveNewUser(user, privkey){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "INTERNAL_ERROR"
+                    errorKey : "ERRORS.INTERNAL_ERROR"
                 }
 				var error = new CustomError(errorInfo);
 				return reject(error);
@@ -139,7 +139,7 @@ function saveNewUser(user, privkey){
                     var errorInfo = {
                         status : 500,
                         errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "INTERNAL_ERROR"
+                        errorKey : "ERRORS.INTERNAL_ERROR"
                     }
     				var error = new CustomError(errorInfo);
     				return reject(error);
@@ -168,7 +168,7 @@ function checkUserEmail(user){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "INTERNAL_ERROR"
+                    errorKey : "ERRORS.INTERNAL_ERROR"
                 }
 				var error = new CustomError(errorInfo);
 				return reject(error);
@@ -177,7 +177,7 @@ function checkUserEmail(user){
 				var error = {
 					status: 404,
 					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-					errorKey: "INVALID_USER_OR_PASSWORD"
+					errorKey: "ERRORS.INVALID_USER_OR_PASSWORD"
 				};
 				var userNotFoundError = new CustomError(error);
 				return reject(userNotFoundError);
@@ -197,7 +197,7 @@ function compareHash(users){
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "INTERNAL_ERROR"
+                    errorKey : "ERRORS.INTERNAL_ERROR"
                 }
 				var error = new CustomError(errorInfo);
 				return reject(error);
@@ -207,7 +207,7 @@ function compareHash(users){
 				var error = {
 					status: 404,
 					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-					errorKey: "INCORRECT_USER_OR_PASSWORD"
+					errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
 				};
 				var passwordNotMatchError = new CustomError(error);
 				return reject(passwordNotMatchError);
