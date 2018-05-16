@@ -11,6 +11,15 @@ var saltRounds = 10;
 module.exports.register = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
+    if(user.password.toString() != user.repeatPassword.toString()){
+        var errorInfo = {
+            status : 500,
+            errorCode : errorCodes.PASSWORD_DONT_MATCH,
+            errorKey : "PASSWORD_DONT_MATCH"
+        }
+        var error = new CustomError(errorInfo);
+        callback(error, undefined);
+    }
     checkNewUserEmail(user)
     .then(user => createHash(user))
     .then(user => createKeyPair(user))
