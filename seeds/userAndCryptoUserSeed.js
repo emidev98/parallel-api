@@ -3,14 +3,14 @@ var CryptoUser = require('../models/CryptoUser');
 
 var user = new User(
     {
-        publickey: 3,
+        publicKey: 2,
         image: "",
-        name: "test",
-        lastname: "test2",
+        firstName: "test",
+        lastName: "test2",
         email: "test@test.test",
         password:"testpasswd",
         language: "javascript",
-        accountgroups:
+        accountGroups:
             [{
                 _id: 1,
                 image: "",
@@ -23,7 +23,16 @@ var user = new User(
                         description: "descriptiontest",
                         user: "facebookUser",
                         password: "ThisIsMyPassword"
-                    }]
+                    },
+                    {
+                        _id: 2,
+                        title: "Facebook",
+                        image: "test",
+                        description: "descriptiontest",
+                        user: "facebookUser",
+                        password: "ThisIsMyPassword"
+                    }
+                ]
             },
             {
                 _id: 2,
