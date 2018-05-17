@@ -7,10 +7,22 @@ var CustomError = require('../errors/CustomError');
 var errorCodes  = require('../errors/errorCodes');
 var fs          = require("fs");
 var randtoken   = require('rand-token');
+var saltRounds = 10;
+
+// Get pair key to encrypt and decrypt private keys
+var privatekey  = "";
+var publickey   = "";
+fs.readFile("/home/msala/git/key.pem", function(err, data){
+    privatekey = data.toString();
+    privatekey = openpgp.key.readArmored(privatekey).keys[0];
+});
+fs.readFile("/home/msala/git/public.pem", function(err, data){
+    publickey = data.toString();
+    publickey = openpgp.key.readArmored(publickey);
+});
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
-var saltRounds = 10;
 
 module.exports.isLogged = function(authentication, callback){
     User.findOne({
@@ -118,8 +130,15 @@ function createKeyPair(user){
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publicKey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;
-            var resolveReturn = [user, privkey];
-			resolve(resolveReturn);
+            var encryptionOptions = {
+                data: privkey,
+                publicKeys: publickey.keys
+            };
+            openpgp.encrypt(encryptionOptions).then(function(ciphertext){
+                var privkeyencrypted = ciphertext.data;
+                var resolveReturn = [user, privkeyencrypted];
+                resolve(resolveReturn);
+            });
 		}).catch(function(err){
             console.log(err);
         });

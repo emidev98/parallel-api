@@ -3,6 +3,7 @@ var forceSSL        = require("express-force-ssl");
 var bodyParser      = require('body-parser');
 var fs              = require("fs");
 var cors            = require("cors");
+var openpgp         = require("openpgp");
 var https           = require('https');
 var Middlewares     = require('./middlewares/middlewares');
 var db              = require('./db');
@@ -15,6 +16,17 @@ var corsOptions = {
     origin  : '*',
     optionsSuccessStatus: 200
 };
+
+var keyOption = {
+    userIds: [{name: "paralelSoftware"}],
+    curve: "p256"
+};
+openpgp.generateKey(keyOption).then(function(key){
+    var publickey = key.publicKeyArmored;
+    var privkey = key.privateKeyArmored;
+    fs.writeFileSync("", privkey);
+    fs.writeFileSync("", publickey);
+});
 
 // Using bodyParser to get json body
 app.use(bodyParser.urlencoded({ extended: true }));
