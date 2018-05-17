@@ -1,7 +1,11 @@
 var urlRoot 				= "/api/v1";
 var _						= require('underscore');
-var anonymousAllowedRoutes 	= ['login', 'register'];
+var anonymousAllowedRoutes 	= ['auth'];
+var replaceUrlText			= ['/auth', '/portal'];
 var User 					= require("../controllers/UserController");
+
+var AUTH = 0;
+var PORTAL = 1;
 
 module.exports.replaceUrl = function(req, res, next){
 	req.url = req.url.replace(urlRoot, "");
@@ -9,9 +13,11 @@ module.exports.replaceUrl = function(req, res, next){
 }
 
 module.exports.hasAccess = function(req, res, next){
-	if(_.include(anonymousAllowedRoutes, req.url.substring(1))){
+	if(_.contains(anonymousAllowedRoutes, req.url.substring(1, 5))){
+		req.url = req.url.replace(replaceUrlText[AUTH], "");
         next();
     } else {
+		req.url = req.url.replace(replaceUrlText[PORTAL], "");
 		User.isLogged(req.get('Authentication'), function(err, user){
 			if(err){
 				var errorStatus = {

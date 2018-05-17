@@ -25,8 +25,12 @@ fs.readFile("/home/paralel/paralelAPI/public.pem", function(err, data){
 openpgp.initWorker({ path:'openpgp.worker.js' });
 
 module.exports.isLogged = function(authentication, callback){
+    var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
+    var tokenString = authenticationString.slice(0, 16);
+    var emailString = authenticationString.slice(16);
     User.findOne({
-        token: authentication
+        token: tokenString,
+        email: emailString
     }, function(err, user){
         if(err) {
             console.log(err)
