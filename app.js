@@ -3,7 +3,6 @@ var forceSSL        = require("express-force-ssl");
 var bodyParser      = require('body-parser');
 var fs              = require("fs");
 var cors            = require("cors");
-var openpgp         = require("openpgp");
 var https           = require('https');
 var Middlewares     = require('./middlewares/middlewares');
 var db              = require('./db');
