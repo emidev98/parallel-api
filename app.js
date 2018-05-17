@@ -17,17 +17,6 @@ var corsOptions = {
     optionsSuccessStatus: 200
 };
 
-var keyOption = {
-    userIds: [{name: "paralelSoftware"}],
-    curve: "p256"
-};
-openpgp.generateKey(keyOption).then(function(key){
-    var publickey = key.publicKeyArmored;
-    var privkey = key.privateKeyArmored;
-    fs.writeFileSync("", privkey);
-    fs.writeFileSync("", publickey);
-});
-
 // Using bodyParser to get json body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

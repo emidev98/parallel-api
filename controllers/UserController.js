@@ -12,11 +12,11 @@ var saltRounds = 10;
 // Get pair key to encrypt and decrypt private keys
 var privatekey  = "";
 var publickey   = "";
-fs.readFile("/home/msala/git/key.pem", function(err, data){
+fs.readFile("/home/paralel/paralelAPI/key.pem", function(err, data){
     privatekey = data.toString();
     privatekey = openpgp.key.readArmored(privatekey).keys[0];
 });
-fs.readFile("/home/msala/git/public.pem", function(err, data){
+fs.readFile("/home/paralel/paralelAPI/public.pem", function(err, data){
     publickey = data.toString();
     publickey = openpgp.key.readArmored(publickey);
 });
