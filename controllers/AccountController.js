@@ -5,7 +5,7 @@ var errorCodes   = require('../responses/errorCodes');
 var CustomError  = require('../responses/CustomError');
 
 module.exports.createAccount = function(userEmail, account, callback){
-    User.find({
+    User.findOne({
         email: userEmail
     }, function (err, user){
         if (err){

@@ -4,9 +4,10 @@ module.exports = function(app){
     * CONTROLLERS *****
     ******************/
 
-    var helloWorld = require('../controllers/HelloWorldController');
-    var User = require('../controllers/UserController');
-    var Account = require('../controllers/AccountController');
+    var helloWorld   = require('../controllers/HelloWorldController');
+    var User         = require('../controllers/UserController');
+    var Account      = require('../controllers/AccountController');
+    var successCodes = require('../responses/successCodes');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -71,5 +72,34 @@ module.exports = function(app){
     app.get('/portal/accounts', function(req, res){
         var userEmail = req.get('email');
 
-    })
+    });
+
+    app.put('/portal/accounts', function(req, res){
+        var userEmail = req.get('email');
+        Account.createAccount(userEmail, req.body, function(err, account){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnAccount = {
+                success: {
+                    successCode: successCode.ACCOUNT_SUCCESSFULLY_CREATED,
+                    successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_CREATED"
+                },
+                data: {
+                    id: account._id,
+                    userGroupId: account.userGroupId,
+                    title : account.title,
+                    image : account.image,
+                    description : account.description,
+                    user : account.user,
+                    password : account.password
+                }
+            }
+            res.status(200).send(returnAccount);
+        });
+    });
 }
