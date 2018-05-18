@@ -1,25 +1,13 @@
-var express 	= require('express');
-var User 		= require('../models/User');
-var CryptoUser 	= require('../models/CryptoUser');
-var bcrypt  	= require('bcrypt');
-var openpgp 	= require('openpgp');
-var CustomError = require('../errors/CustomError');
-var errorCodes  = require('../errors/errorCodes');
-var fs          = require("fs");
-var randtoken   = require('rand-token');
+var express 	            = require('express');
+var User 		            = require('../models/User');
+var bcrypt  	            = require('bcrypt');
+var openpgp 	            = require('openpgp');
+var CustomError             = require('../errors/CustomError');
+var errorCodes              = require('../errors/errorCodes');
+var fs                      = require("fs");
+var randtoken               = require('rand-token');
+var CryptoUserController    = require('./CryptoUserController');
 var saltRounds = 10;
-
-// Get pair key to encrypt and decrypt private keys
-var privatekey  = "";
-var publickey   = "";
-fs.readFile("/home/paralel/paralelAPI/key.pem", function(err, data){
-    privatekey = data.toString();
-    privatekey = openpgp.key.readArmored(privatekey).keys[0];
-});
-fs.readFile("/home/paralel/paralelAPI/public.pem", function(err, data){
-    publickey = data.toString();
-    publickey = openpgp.key.readArmored(publickey);
-});
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
@@ -72,6 +60,14 @@ module.exports.register = function(user, callback){
     .then(savedUser => callback(null, savedUser))
     .catch(err => callback(err, undefined))
 }
+
+module.exports.login = function (user, callback){
+	checkUserEmail(user)
+		.then(users => compareHash(users))
+		.then(userDB => callback(null, userDB))
+		.catch(err => callback(err, undefined))
+}
+
 
 function checkNewUserEmail(user){
 	return new Promise(function(resolve, reject) {
@@ -130,15 +126,8 @@ function createKeyPair(user){
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publicKey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;
-            var encryptionOptions = {
-                data: privkey,
-                publicKeys: publickey.keys
-            };
-            openpgp.encrypt(encryptionOptions).then(function(ciphertext){
-                var privkeyencrypted = ciphertext.data;
-                var resolveReturn = [user, privkeyencrypted];
-                resolve(resolveReturn);
-            });
+            var resolveReturn = [user, privkey];
+            resolve(resolveReturn);
 		}).catch(function(err){
             console.log(err);
         });
@@ -147,6 +136,7 @@ function createKeyPair(user){
 
 function saveNewUser(user, privkey){
 	return new Promise(function(resolve, reject) {
+        user.token = randtoken.generate(16);
 		User.create(user, function(err, savedUser){
 			if(err){
                 var errorInfo = {
@@ -157,44 +147,18 @@ function saveNewUser(user, privkey){
 				var error = new CustomError(errorInfo);
 				return reject(error);
 			}
-            savedUser.token = randtoken.generate(16);
-            savedUser.save(function(err, savedUserWithToken) {
-                if(err){
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-    				var error = new CustomError(errorInfo);
-    				return reject(error);
-    			}
-                var newCryptoUser = {
-    				userId: savedUser._id,
-    				privateKey: privkey,
-    			}
-    			CryptoUser.create(newCryptoUser, function(err, cryptoUser){
-    				if(err){
-                        var errorInfo = {
-                            status : 500,
-                            errorCode : errorCodes.INTERNAL_ERROR,
-                            errorKey : "ERRORS.INTERNAL_ERROR"
-                        }
-        				var error = new CustomError(errorInfo);
-        				return reject(error);
-    				}
-    				resolve(savedUser);
-    			});
-            })
+            var newCryptoUser = {
+				userId: savedUser._id,
+				privateKey: privkey,
+			}
+            CryptoUserController.saveCryptoUser(newCryptoUser)
+            .then(function(cryptoUser){
+                return resolve(savedUser);
+            }).catch(function(error){
+                return reject(error);
+            });
 		});
 	});
-}
-
-
-module.exports.login = function (user, callback){
-	checkUserEmail(user)
-		.then(users => compareHash(users))
-		.then(userDB => callback(null, userDB))
-		.catch(err => callback(err, undefined))
 }
 
 function checkUserEmail(user){
