@@ -40,3 +40,36 @@ module.exports.createAccount = function(userEmail, account, callback){
         })
     })
 }
+
+module.exports.getAllAccounts = function(userEmail, callback){
+    User.findOne({
+        email: userEmail
+    }, function(err, user){
+        if (err){
+            console.log(err)
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        var requestUserId = user._id;
+        Account.find({
+            userId: requestUserId
+        }, 'userGroupId title image description user', function(err, accounts){
+            if (err){
+                console.log(err)
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return callback(error, undefined);
+            }
+            return callback(null, accounts);
+        });
+    });
+}

@@ -69,10 +69,24 @@ module.exports = function(app){
     * ACCOUNTS ROUTES ****
     **********************/
 
-    app.get('/portal/accounts', function(req, res){
+    app.get('/accounts', function(req, res){
         var userEmail = req.get('email');
-
+        console.log(userEmail);
+        Account.getAllAccounts(userEmail, function(err, accounts){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var responseReturn = {
+                data : accounts
+            }
+            res.status(200).send(responseReturn);
+        });
     });
+
 
     app.put('/portal/accounts', function(req, res){
         var userEmail = req.get('email');
@@ -86,7 +100,7 @@ module.exports = function(app){
             }
             var returnAccount = {
                 success: {
-                    successCode: successCode.ACCOUNT_SUCCESSFULLY_CREATED,
+                    successCode: successCodes.ACCOUNT_SUCCESSFULLY_CREATED,
                     successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_CREATED"
                 },
                 data: {

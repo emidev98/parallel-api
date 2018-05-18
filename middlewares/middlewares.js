@@ -30,7 +30,7 @@ module.exports.hasAccess = function(req, res, next){
 				}
 				return res.status(err.status).send(errorStatus);
 			}
-			req.body.email = emailString;
+			req.headers.email = emailString;
 			next();
 		});
     }
