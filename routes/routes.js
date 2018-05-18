@@ -74,8 +74,8 @@ module.exports = function(app){
 
     });
 
-    app.put('/portal/accounts', function(req, res){
-        var userEmail = req.get('email');
+    app.put('/accounts', function(req, res){
+        var userEmail = req.get('body');
         Account.createAccount(userEmail, req.body, function(err, account){
             if (err) {
                 var error = {
@@ -86,7 +86,7 @@ module.exports = function(app){
             }
             var returnAccount = {
                 success: {
-                    successCode: successCode.ACCOUNT_SUCCESSFULLY_CREATED,
+                    successCode: successCodes.ACCOUNT_SUCCESSFULLY_CREATED,
                     successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_CREATED"
                 },
                 data: {
