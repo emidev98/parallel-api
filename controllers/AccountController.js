@@ -1,4 +1,5 @@
 var express 	 = require('express');
+var openpgp      = require('openpgp');
 var User 		 = require('../models/User');
 var Account      = require('../models/Account');
 var errorCodes   = require('../responses/errorCodes');
@@ -17,27 +18,36 @@ module.exports.createAccount = function(userEmail, account, callback){
             var error = new CustomError(errorInfo);
             return callback(error, undefined);
         }
-        var newAccount = new Account({
-            userId: user._id,
-            userGroupId: account.userGroupId,
-            title: account.title,
-            image: account.image,
-            description: account.description,
-            user: account.user,
-            password: account.password
-        });
-        newAccount.save(function(err, savedAccount){
-            if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
+        var publicKey = user.publicKey;
+        var passwd = account.password;
+        var options = {
+            data: passwd,                             // input as String (or Uint8Array)
+            publicKeys: openpgp.key.readArmored(publicKey).keys,  // for encryption
+        };
+
+        openpgp.encrypt(options).then(function(ciphertext) {
+            var newAccount = new Account({
+                userId: user._id,
+                userGroupId: account.userGroupId,
+                title: account.title,
+                image: account.image,
+                description: account.description,
+                user: account.user,
+                password: ciphertext.data
+            });
+            newAccount.save(function(err, savedAccount){
+                if (err){
+                    var errorInfo = {
+                        status : 500,
+                        errorCode : errorCodes.INTERNAL_ERROR,
+                        errorKey : "ERRORS.INTERNAL_ERROR"
+                    }
+                    var error = new CustomError(errorInfo);
+                    return callback(error, undefined);
                 }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
-            }
-            callback(null, savedAccount);
-        })
+                callback(null, savedAccount);
+            })
+        });
     })
 }
 
