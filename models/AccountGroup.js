@@ -8,6 +8,6 @@ var AccountGroupsSchema = new Schema({
     userId: ObjectId,
     image: String,
     name: String
-}, {collection: "accountGroups"});
+}, {collection: "accountgroups"});
 
 module.exports = conn.model('AccountGroup', AccountGroupsSchema);
