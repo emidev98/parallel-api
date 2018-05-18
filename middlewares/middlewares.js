@@ -18,7 +18,11 @@ module.exports.hasAccess = function(req, res, next){
         next();
     } else {
 		req.url = req.url.replace(replaceUrlText[PORTAL], "");
-		User.isLogged(req.get('Authentication'), function(err, user){
+		var authentication = req.get('Authentication');
+		var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
+	    var tokenString = authenticationString.slice(0, 16);
+	    var emailString = authenticationString.slice(16);
+		User.isLogged(tokenString, emailString, function(err, user){
 			if(err){
 				var errorStatus = {
 					errorCode: err.errorCode,
@@ -26,6 +30,7 @@ module.exports.hasAccess = function(req, res, next){
 				}
 				return res.status(err.status).send(errorStatus);
 			}
+			req.body.email = emailString;
 			next();
 		});
     }

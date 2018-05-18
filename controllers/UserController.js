@@ -24,10 +24,7 @@ fs.readFile("/home/paralel/paralelAPI/public.pem", function(err, data){
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
 
-module.exports.isLogged = function(authentication, callback){
-    var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
-    var tokenString = authenticationString.slice(0, 16);
-    var emailString = authenticationString.slice(16);
+module.exports.isLogged = function(tokenString, emailString, callback){
     User.findOne({
         token: tokenString,
         email: emailString
@@ -128,7 +125,6 @@ function createKeyPair(user){
 	return new Promise(function(resolve, reject) {
 		var keyOption = {
 			userIds: [{name: user.firstName, email: user.email}],
-			passphrase: user.password,
 			curve: "p256"
 		};
 		openpgp.generateKey(keyOption).then(function(key){
