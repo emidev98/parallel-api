@@ -1,13 +1,14 @@
-var express 	= require('express');
-var User 		= require('../models/User');
-var CryptoUser 	= require('../models/CryptoUser');
-var bcrypt  	= require('bcrypt');
-var openpgp 	= require('openpgp');
-var CustomError = require('../errors/CustomError');
-var errorCodes  = require('../errors/errorCodes');
-var fs          = require("fs");
-var randtoken   = require('rand-token');
-var saltRounds = 10;
+var express 	 = require('express');
+var User 		 = require('../models/User');
+var CryptoUser 	 = require('../models/CryptoUser');
+var bcrypt  	 = require('bcrypt');
+var openpgp 	 = require('openpgp');
+var CustomError  = require('../errors/CustomError');
+var errorCodes   = require('../errors/errorCodes');
+var fs           = require("fs");
+var randtoken    = require('rand-token');
+var AccountGroup = require('AccountGroup');
+var saltRounds   = 10;
 
 // Get pair key to encrypt and decrypt private keys
 var privatekey  = "";
@@ -168,6 +169,23 @@ function saveNewUser(user, privkey){
     				var error = new CustomError(errorInfo);
     				return reject(error);
     			}
+                var defaultAccountGroup = new AccountGroup({
+                    userGroupId: -1,
+                    userId: savedUser._id,
+                    image: "",
+                    name: "Accounts"
+                });
+                defaultAccountGroup.save(function(err, accountGroup){
+                    if (err){
+                        var errorInfo = {
+                            status : 500,
+                            errorCode : errorCodes.INTERNAL_ERROR,
+                            errorKey : "ERRORS.INTERNAL_ERROR"
+                        }
+        				var error = new CustomError(errorInfo);
+        				return reject(error);
+                    }
+                });
                 var newCryptoUser = {
     				userId: savedUser._id,
     				privateKey: privkey,
