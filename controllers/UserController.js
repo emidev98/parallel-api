@@ -2,12 +2,14 @@ var express 	            = require('express');
 var User 		            = require('../models/User');
 var bcrypt  	            = require('bcrypt');
 var openpgp 	            = require('openpgp');
-var CustomError             = require('../errors/CustomError');
-var errorCodes              = require('../errors/errorCodes');
+var CustomError             = require('../responses/CustomError');
+var errorCodes              = require('../responses/errorCodes');
 var fs                      = require("fs");
 var randtoken               = require('rand-token');
 var CryptoUserController    = require('./CryptoUserController');
-var saltRounds = 10;
+var CryptoUser 	            = require('../models/CryptoUser');
+var AccountGroup            = require('../models/AccountGroup');
+var saltRounds              = 10;
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
@@ -147,15 +149,32 @@ function saveNewUser(user, privkey){
 				var error = new CustomError(errorInfo);
 				return reject(error);
 			}
-            var newCryptoUser = {
-				userId: savedUser._id,
-				privateKey: privkey,
-			}
-            CryptoUserController.saveCryptoUser(newCryptoUser)
-            .then(function(cryptoUser){
-                return resolve(savedUser);
-            }).catch(function(error){
-                return reject(error);
+            var defaultAccountGroup = new AccountGroup({
+                userGroupId: -1,
+                userId: savedUser._id,
+                image: "",
+                name: "Accounts"
+            });
+            defaultAccountGroup.save(function(err, accountGroup){
+                if (err){
+                    var errorInfo = {
+                        status : 500,
+                        errorCode : errorCodes.INTERNAL_ERROR,
+                        errorKey : "ERRORS.INTERNAL_ERROR"
+                    }
+                    var error = new CustomError(errorInfo);
+                    return reject(error);
+                }
+                var newCryptoUser = {
+    				userId: savedUser._id,
+    				privateKey: privkey,
+    			}
+                CryptoUserController.saveCryptoUser(newCryptoUser)
+                .then(function(cryptoUser){
+                    return resolve(savedUser);
+                }).catch(function(error){
+                    return reject(error);
+                });
             });
 		});
 	});

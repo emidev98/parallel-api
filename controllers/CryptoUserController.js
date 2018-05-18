@@ -2,6 +2,8 @@ var express 	= require('express');
 var openpgp 	= require('openpgp');
 var fs          = require("fs");
 var CryptoUser 	= require('../models/CryptoUser');
+var CustomError = require('../responses/CustomError');
+var errorCodes  = require('../responses/errorCodes');
 
 var privatekey  = "";
 var publickey   = "";
