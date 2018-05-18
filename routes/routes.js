@@ -87,8 +87,7 @@ module.exports = function(app){
         });
     });
 
-
-    app.put('/portal/accounts', function(req, res){
+    app.put('/accounts', function(req, res){
         var userEmail = req.get('email');
         Account.createAccount(userEmail, req.body, function(err, account){
             if (err) {
