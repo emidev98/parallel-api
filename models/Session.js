@@ -9,7 +9,7 @@ var SessionsSchema = new Schema({
     location: String,
     browser: String,
     os: String,
-    date: Date
+    date: {type: Date, default: Date.now}
 }, {collection: "sessions"});
 
 module.exports = conn.model('Session', SessionsSchema);
