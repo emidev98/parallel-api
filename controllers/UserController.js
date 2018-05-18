@@ -20,7 +20,6 @@ module.exports.isLogged = function(tokenString, emailString, callback){
         email: emailString
     }, function(err, user){
         if(err) {
-            console.log(err)
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INTERNAL_ERROR,
@@ -30,7 +29,6 @@ module.exports.isLogged = function(tokenString, emailString, callback){
             return callback(error, undefined);
         }
         if(user === null){
-            console.log(err)
             var errorInfo = {
                 status : 500,
                 errorCode : errorCodes.INCORRECT_TOKEN,
@@ -112,7 +110,6 @@ function createHash(user){
 				var error = new CustomError(errorInfo);
 				return reject(error);
 			}
-            console.log(hash);
 			user.password = hash;
 			resolve(user);
 		});
@@ -131,7 +128,7 @@ function createKeyPair(user){
             var resolveReturn = [user, privkey];
             resolve(resolveReturn);
 		}).catch(function(err){
-            console.log(err);
+            reject(err);
         });
 	});
 }
@@ -186,7 +183,6 @@ function checkUserEmail(user){
 			email: user.email
 		}, function (err, userDB){
             if(err) {
-                console.log(err);
                 var errorInfo = {
                     status : 500,
                     errorCode : errorCodes.INTERNAL_ERROR,
@@ -225,7 +221,6 @@ function compareHash(users){
 				return reject(error);
 			}
 			if (!res){
-                console.log(res);
 				var error = {
 					status: 404,
 					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
@@ -234,7 +229,6 @@ function compareHash(users){
 				var passwordNotMatchError = new CustomError(error);
 				return reject(passwordNotMatchError);
 			}
-            console.log("Before resolve");
 			resolve(users[USER_DB]);
 		});
     })
