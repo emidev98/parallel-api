@@ -83,3 +83,33 @@ module.exports.getAllAccounts = function(userEmail, callback){
         });
     });
 }
+
+module.exports.deleteAccount = function(accountId, callback){
+    var resAccount;
+    Account.findOne({
+        _id: accountId
+    }, function(err, account){
+        if (err){
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        resAccount = account;
+        account.remove(function(err){
+            if (err){
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return callback(error, undefined);
+            }
+            return callback(null, resAccount);
+        })
+    })
+}

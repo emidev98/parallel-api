@@ -115,4 +115,25 @@ module.exports = function(app){
             res.status(200).send(returnAccount);
         });
     });
+
+    app.delete('/accounts/:id', function(req, res){
+        Account.deleteAccount(req.params.id, function(err, account){
+            var returnAccount = {
+                success: {
+                    successCode: successCodes.ACCOUNT_SUCCESSFULLY_DELETED,
+                    successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_DELETED"
+                },
+                data: {
+                    id: account._id,
+                    userGroupId: account.userGroupId,
+                    title : account.title,
+                    image : account.image,
+                    description : account.description,
+                    user : account.user,
+                    password : account.password
+                }
+            }
+            res.status(200).send(returnAccount);
+        })
+    })
 }
