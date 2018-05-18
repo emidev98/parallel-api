@@ -136,4 +136,25 @@ module.exports = function(app){
             res.status(200).send(returnAccount);
         })
     })
+
+    app.post('/accounts/:id', function(req, res){
+        var userEmail = req.get('email');
+        Account.modifyAccount(userEmail, req.params.id, req.body, function(err, account){
+            var returnAccount = {
+                success: {
+                    successCode: successCodes.ACCOUNT_SUCCESSFULLY_MODIFIED,
+                    successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_MODIFIED"
+                },
+                data: {
+                    userGroupId: account.userGroupId,
+                    title : account.title,
+                    image : account.image,
+                    description : account.description,
+                    user : account.user,
+                    password : account.password
+                }
+            }
+            res.status(200).send(returnAccount);
+        })
+    })
 }
