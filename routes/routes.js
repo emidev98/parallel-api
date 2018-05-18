@@ -6,6 +6,7 @@ module.exports = function(app){
 
     var helloWorld = require('../controllers/HelloWorldController');
     var User = require('../controllers/UserController');
+    var Account = require('../controllers/AccountController');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -62,4 +63,13 @@ module.exports = function(app){
             res.status(200).send(returnUser);
         });
     });
+
+    /*********************
+    * ACCOUNTS ROUTES ****
+    **********************/
+
+    app.get('/portal/accounts', function(req, res){
+        var userEmail = req.get('email');
+
+    })
 }
