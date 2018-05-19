@@ -20,8 +20,9 @@ module.exports.hasAccess = function(req, res, next){
 		req.url = req.url.replace(replaceUrlText[PORTAL], "");
 		var authentication = req.get('Authentication');
 		var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
-	    var tokenString = authenticationString.slice(0, 16);
-	    var emailString = authenticationString.slice(16);
+		var authenticationComponents = authenticationString.split("|");
+	    var tokenString = authenticationComponents[0];
+	    var emailString = authenticationComponents[1];
 		User.isLogged(tokenString, emailString, function(err, user){
 			if(err){
 				var errorStatus = {
