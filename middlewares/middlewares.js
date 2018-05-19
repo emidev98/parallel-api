@@ -19,7 +19,7 @@ module.exports.hasAccess = function(req, res, next){
     } else {
 		req.url = req.url.replace(replaceUrlText[PORTAL], "");
 		var authentication = req.get('Authentication');
-		var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
+		var authenticationString = Buffer.from(authentication, 'base64').toString('ascii');
 		var authenticationComponents = authenticationString.split("|");
 	    var tokenString = authenticationComponents[0];
 	    var emailString = authenticationComponents[1];
