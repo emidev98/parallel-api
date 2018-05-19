@@ -34,11 +34,8 @@ module.exports = function(app){
                 return res.status(err.status).send(errorStatus);
             }
             var responseObject = {
+                id : user._id,
                 token : user.token,
-                language : user.language,
-                email : user.email,
-                firstName : user.firstName,
-                lastName : user.lastName,
             }
             res.status(200).send(responseObject);
         });
@@ -55,11 +52,8 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var returnUser = {
+                id : userDB._id,
                 token: userDB.token,
-                language: userDB.language,
-                email: userDB.email,
-                firstName: userDB.firstName,
-                lastName: userDB.lastName
             }
             res.status(200).send(returnUser);
         });
