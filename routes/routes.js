@@ -65,6 +65,28 @@ module.exports = function(app){
         });
     });
 
+    app.get('/user/:id', function(req, res){
+        User.getUser(req.params.id, function(err, user){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnUser = {
+                image: user.image,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                age: user.age,
+                email: user.email,
+                password: user.password,
+                language: user.language
+            }
+            res.status(200).send(returnUser);
+        })
+    });
+
     /*********************
     * ACCOUNTS ROUTES ****
     **********************/

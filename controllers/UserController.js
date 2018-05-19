@@ -9,6 +9,8 @@ var randtoken               = require('rand-token');
 var CryptoUserController    = require('./CryptoUserController');
 var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
+var mongoose                = require('mongoose');
+var ObjectId                = mongoose.Schema.Types.ObjectId;
 var saltRounds              = 10;
 
 
@@ -68,6 +70,31 @@ module.exports.login = function (user, callback){
 		.catch(err => callback(err, undefined))
 }
 
+module.exports.getUser = function(userId, callback){
+    User.findOne({
+        _id: ObjectId(userId)
+    }, function(err, user){
+        if(err) {
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        if (!user){
+            var error = {
+                status: 404,
+                errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
+                errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
+            };
+            var passwordNotMatchError = new CustomError(error);
+            return callback(passwordNotMatchError, undefined);
+        }
+        callback(null, user)
+    })
+}
 
 function checkNewUserEmail(user){
 	return new Promise(function(resolve, reject) {
