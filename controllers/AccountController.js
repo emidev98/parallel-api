@@ -4,6 +4,7 @@ var User 		 = require('../models/User');
 var Account      = require('../models/Account');
 var errorCodes   = require('../responses/errorCodes');
 var CustomError  = require('../responses/CustomError');
+var CryptoUser   = require('./CryptoUserController');
 
 module.exports.createAccount = function(userEmail, account, callback){
     User.findOne({
@@ -81,6 +82,39 @@ module.exports.getAllAccounts = function(userEmail, callback){
             return callback(null, accounts);
         });
     });
+}
+
+module.exports.getAccountInfo = function(userEmail, accountId, callback){
+    User.findOne({
+        email: userEmail
+    }, function(err, user){
+        if (err){
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        Account.findOne({
+            _id: accountId
+        }, function(err, account){
+            if (err){
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return callback(error, undefined);
+            }
+            CryptoUser.getPrivateKey(user._id)
+            .then(plaintext => decryptPassoword(plaintext, account))
+            .then(accountWithPassword => callback(null, accountWithPassword))
+            .catch(err => callback(err, undefined))
+        })
+    })
 }
 
 module.exports.deleteAccount = function(accountId, callback){
@@ -192,4 +226,24 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
 
         })
     })
+}
+
+
+function decryptPassoword(privkey, account){
+    console.log(privkey);
+    console.log(account);
+    return new Promise(function(resolve, reject) {
+        console.log(openpgp.key.readArmored(privkey).keys);
+        decryptOptions = {
+            message: openpgp.message.readArmored(account.password),
+            privateKeys: openpgp.key.readArmored(privkey).keys[0]
+        }
+        openpgp.decrypt(decryptOptions).then(function(plaintext) {
+            account.password = plaintext.data;
+            return resolve(account)
+        }).catch(function(err) {
+            console.log(err)
+            return reject(err);
+        });
+    });
 }

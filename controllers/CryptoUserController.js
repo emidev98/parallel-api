@@ -43,3 +43,30 @@ module.exports.saveCryptoUser = function(newCryptoUser){
         });
     });
 }
+
+module.exports.getPrivateKey = function(userId){
+    return new Promise(function(resolve, reject) {
+        CryptoUser.findOne({
+            userId: userId
+        }, function(err, privKey){
+            if(err){
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return reject(error);
+            }
+            decryptOptions = {
+                message: openpgp.message.readArmored(privKey.privateKey),
+                privateKeys: [privatekey]
+            }
+            openpgp.decrypt(decryptOptions).then(function(plaintext) {
+                return resolve(plaintext.data)
+            }).catch(function(err) {
+                return reject(err);
+            });
+        });
+    });
+}

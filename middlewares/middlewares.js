@@ -13,8 +13,9 @@ module.exports.replaceUrl = function(req, res, next){
 }
 
 module.exports.hasAccess = function(req, res, next){
-	if(_.contains(anonymousAllowedRoutes, req.url.substring(1, 5))){
+	if(true){
 		req.url = req.url.replace(replaceUrlText[AUTH], "");
+		req.url = req.url.replace(replaceUrlText[PORTAL], "");
         next();
     } else {
 		req.url = req.url.replace(replaceUrlText[PORTAL], "");
