@@ -108,7 +108,6 @@ module.exports.modifyUser = function(userId, user, callback){
             var error = new CustomError(errorInfo);
             return callback(error, undefined);
         }
-
         if (user.image)
             userDb.image = user.image;
         if (user.firstName)
@@ -140,6 +139,37 @@ module.exports.modifyUser = function(userId, user, callback){
         })
     })
 }
+
+
+
+/*module.exports.changePassword = function(requestBody, callback){
+    var oldPassword = requestBody.actualPassword;
+    var oldPasswordRepeat = requestBody.actualPasswordRepeat;
+    if(oldPassword != oldPasswordRepeat){
+        //TODO: Throw error
+    }
+    User.findOne({
+        email: requestBody.email
+    }, function(err, userInDb){
+        if(err) {
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        var frontEndUser = {
+            email: requestBody.email,
+            password: requestBody.password
+        }
+        var usersForHash = [frontEndUser, userInDb];
+        compareHash(usersForHash)
+        .then(userDB => createHash(user))
+        .catch(err => callback(err, undefined))
+    })
+}*/
 
 module.exports.deleteUser = function(userId, callback){
     var resUser;
@@ -249,7 +279,7 @@ function saveNewUser(user, privkey){
 				return reject(error);
 			}
             var defaultAccountGroup = new AccountGroup({
-                userGroupId: -1,
+                index: -1,
                 userId: savedUser._id,
                 image: "",
                 name: "Accounts"
