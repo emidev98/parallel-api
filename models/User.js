@@ -4,7 +4,6 @@ var AccountGroup = require('./AccountGroup');
 var conn         = mongoose.createConnection('mongodb://readerWritterUsersDb:ParalelUsersDbRandW@localhost/users?authSource=users');
 
 var UsersSchema = new Schema({
-    image: String,
     publicKey: {type: String, unique: true},
     token: String,
     firstName: String,
@@ -16,7 +15,8 @@ var UsersSchema = new Schema({
     googleId: String,
     style: {
         backgroundImage: String,
-        isGridView: Boolean
+        isGridView: Boolean,
+        image: String
     }
 }, { collection : 'users' });
 
@@ -24,7 +24,7 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
     var max;
     AccountGroup.findOne()
         .where({userId: this._id})
-        .sort('-userGroupId')
+        .sort('-index')
         .exec(function(err, doc)
             {
                 if (err){
@@ -36,7 +36,7 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
     				var error = new CustomError(errorInfo);
     				return callback(error);
                 }
-                max = doc.userGroupId;
+                max = doc.index;
                 callback(max);
             }
     );

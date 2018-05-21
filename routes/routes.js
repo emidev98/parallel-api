@@ -93,7 +93,6 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var returnUser = {
-                image: user.image,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 age: user.age,
@@ -101,8 +100,9 @@ module.exports = function(app){
                 password: user.password,
                 language: user.language,
                 style: {
-                    backgroundImage: user.image,
-                    isGridView: user.isGridView
+                    backgroundImage: user.style.backgroundImage,
+                    isGridView: user.style.isGridView,
+                    image: user.style.image
                 }
             }
             res.status(200).send(returnUser);
@@ -124,7 +124,6 @@ module.exports = function(app){
                     successKey: "SUCCESS.USER_SUCCESSFULLY_MODIFIED"
                 },
                 data: {
-                    image: user.image,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     age: user.age,
@@ -133,7 +132,8 @@ module.exports = function(app){
                     language: user.language,
                     style: {
                         backgroundImage: user.style.backgroundImage,
-                        isGridView: user.style.isGridView
+                        isGridView: user.style.isGridView,
+                        image: user.style.image
                     }
                 }
             }
@@ -178,8 +178,21 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(error);
             }
+            var returnAccounts = [];
+            for (var i = 0; i < accounts.length; i++){
+                returnAccounts[i] = {
+                    id: accounts[i]._id,
+                    groupId: accounts[i].groupId,
+                    title: accounts[i].title,
+                    image: accounts[i].image,
+                    description: accounts[i].description,
+                    user: accounts[i].user,
+                    password: accounts[i].password,
+                    index: accounts[i].index
+                }
+            }
             var responseReturn = {
-                data : accounts
+                data : returnAccounts
             }
             res.status(200).send(responseReturn);
         });
@@ -220,12 +233,13 @@ module.exports = function(app){
                 },
                 data: {
                     id: account._id,
-                    userGroupId: account.userGroupId,
+                    groupId: account.groupId,
                     title : account.title,
                     image : account.image,
                     description : account.description,
                     user : account.user,
-                    password : account.password
+                    password : account.password,
+                    index: account.index
                 }
             }
             res.status(200).send(returnAccount);
@@ -248,12 +262,13 @@ module.exports = function(app){
                 },
                 data: {
                     id: account._id,
-                    userGroupId: account.userGroupId,
+                    groupId: account.groupId,
                     title : account.title,
                     image : account.image,
                     description : account.description,
                     user : account.user,
-                    password : account.password
+                    password : account.password,
+                    index : account.index
                 }
             }
             res.status(200).send(returnAccount);
@@ -276,12 +291,13 @@ module.exports = function(app){
                     successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_MODIFIED"
                 },
                 data: {
-                    userGroupId: account.userGroupId,
+                    groupId: account.groupId,
                     title : account.title,
                     image : account.image,
                     description : account.description,
                     user : account.user,
-                    password : account.password
+                    password : account.password,
+                    index: account.index
                 }
             }
             res.status(200).send(returnAccount);
@@ -310,7 +326,7 @@ module.exports = function(app){
                 },
                 data: {
                     id: group._id,
-                    userGroupId: group.userGroupId,
+                    index: group.index,
                     name: group.name,
                     image: group.image
                 }
@@ -335,7 +351,8 @@ module.exports = function(app){
                 },
                 data: {
                     name: group.name,
-                    image: group.image
+                    image: group.image,
+                    index: group.index
                 }
             }
             res.status(200).send(returnGroup);
@@ -358,7 +375,7 @@ module.exports = function(app){
                 },
                 data: {
                     id: group._id,
-                    userGroupId: group.userGroupId,
+                    index: group.index,
                     name: group.name,
                     image: group.image
                 }
@@ -379,7 +396,7 @@ module.exports = function(app){
             var returnGroup = {
                 data: {
                     id: group._id,
-                    userGroupId: group.userGroupId,
+                    index: group.index,
                     name: group.name,
                     image: group.image
                 }

@@ -28,12 +28,13 @@ module.exports.createAccount = function(userEmail, account, callback){
         openpgp.encrypt(options).then(function(ciphertext) {
             var newAccount = new Account({
                 userId: user._id,
-                userGroupId: account.userGroupId,
+                groupId: account.groupId,
                 title: account.title,
                 image: account.image,
                 description: account.description,
                 user: account.user,
-                password: ciphertext.data
+                password: ciphertext.data,
+                index: account.index
             });
             newAccount.save(function(err, savedAccount){
                 if (err){
@@ -45,6 +46,7 @@ module.exports.createAccount = function(userEmail, account, callback){
                     var error = new CustomError(errorInfo);
                     return callback(error, undefined);
                 }
+                savedAccount.password = account.password;
                 callback(null, savedAccount);
             })
         });
@@ -68,7 +70,7 @@ module.exports.getAllAccounts = function(userEmail, callback){
         var requestUserId = user._id;
         Account.find({
             userId: requestUserId
-        }, 'userGroupId title image description user', function(err, accounts){
+        }, 'groupId title image description user index', function(err, accounts){
             if (err){
                 console.log(err)
                 var errorInfo = {
@@ -142,7 +144,9 @@ module.exports.deleteAccount = function(accountId, callback){
                 var error = new CustomError(errorInfo);
                 return callback(error, undefined);
             }
-            return callback(null, resAccount);
+            CryptoUser.getPrivateKey(resAccount.userId).then((privkey) => {
+                decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
+            });
         })
     })
 }
@@ -172,8 +176,8 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                 var error = new CustomError(errorInfo);
                 return callback(error, undefined);
             }
-            if (account.userGroupId)
-                accountDb.userGroupId = account.userGroupId;
+            if (account.groupId)
+                accountDb.groupId = account.groupId;
 
             if (account.title)
                 accountDb.title = account.title;
@@ -206,6 +210,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                             var error = new CustomError(errorInfo);
                             return callback(error, undefined);
                         }
+                        savedAccount.password = account.password;
                         callback(null, savedAccount);
                     })
                 })
@@ -220,6 +225,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                         var error = new CustomError(errorInfo);
                         return callback(error, undefined);
                     }
+                    savedAccount.password = account.password;
                     callback(null, savedAccount);
                 })
             }
