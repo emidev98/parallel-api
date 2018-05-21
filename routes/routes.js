@@ -4,10 +4,11 @@ module.exports = function(app){
     * CONTROLLERS *****
     ******************/
 
-    var helloWorld   = require('../controllers/HelloWorldController');
-    var User         = require('../controllers/UserController');
-    var Account      = require('../controllers/AccountController');
     var successCodes = require('../responses/successCodes');
+    var User         = require('../controllers/UserController');
+    var AccountGroup = require('../controllers/GroupsController');
+    var Account      = require('../controllers/AccountController');
+    var helloWorld   = require('../controllers/HelloWorldController');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -152,6 +153,13 @@ module.exports = function(app){
 
     app.delete('/accounts/:id', function(req, res){
         Account.deleteAccount(req.params.id, function(err, account){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
             var returnAccount = {
                 success: {
                     successCode: successCodes.ACCOUNT_SUCCESSFULLY_DELETED,
@@ -168,12 +176,19 @@ module.exports = function(app){
                 }
             }
             res.status(200).send(returnAccount);
-        })
-    })
+        });
+    });
 
     app.post('/accounts/:id', function(req, res){
         var userEmail = req.get('email');
         Account.modifyAccount(userEmail, req.params.id, req.body, function(err, account){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
             var returnAccount = {
                 success: {
                     successCode: successCodes.ACCOUNT_SUCCESSFULLY_MODIFIED,
@@ -189,6 +204,123 @@ module.exports = function(app){
                 }
             }
             res.status(200).send(returnAccount);
+        });
+    });
+
+
+    /*********************
+    * GROUPS ROUTES ******
+    *********************/
+
+    app.put('/groups', function(req, res){
+        var userEmail = req.get('email');
+        AccountGroup.createGroup(userEmail, req.body, function(err, group){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnGroup = {
+                success: {
+                    successCode: successCodes.GROUP_SUCCESSFULLY_CREATED,
+                    successKey: "SUCCESS.GROUP_SUCCESSFULLY_CREATED"
+                },
+                data: {
+                    id: group._id,
+                    userGroupId: group.userGroupId,
+                    name: group.name,
+                    image: group.image
+                }
+            }
+            res.status(200).send(returnGroup);
+        });
+    });
+
+    app.post('/groups/:id', function(req, res){
+        AccountGroup.modifyGroup(req.params.id, req.body, function(err, group){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnGroup = {
+                success: {
+                    successCode: successCodes.GROUP_SUCCESSFULLY_MODIFIED,
+                    successKey: "SUCCESS.GROUP_SUCCESSFULLY_MODIFIED"
+                },
+                data: {
+                    name: group.name,
+                    image: group.image
+                }
+            }
+            res.status(200).send(returnGroup);
+        })
+    });
+
+    app.delete('/groups/:id', function(req, res){
+        AccountGroup.deleteGroup(req.params.id, function(err,group){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnGroup = {
+                success: {
+                    successCode: successCodes.GROUP_SUCCESSFULLY_DELETED,
+                    successKey: "SUCCESS.GROUP_SUCCESSFULLY_DELETED"
+                },
+                data: {
+                    id: group._id,
+                    userGroupId: group.userGroupId,
+                    name: group.name,
+                    image: group.image
+                }
+            }
+            res.status(200).send(returnGroup);
+        })
+    });
+
+    app.get('/groups/:id', function(req, res){
+        AccountGroup.findOneGroup(req.params.id, function(err, group){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnGroup = {
+                data: {
+                    id: group._id,
+                    userGroupId: group.userGroupId,
+                    name: group.name,
+                    image: group.image
+                }
+            }
+            res.status(200).send(returnGroup);
+        })
+    })
+
+    app.get('/groups', function(req, res){
+        var userEmail = req.get('email');
+        AccountGroup.findAll(userEmail, function(err, groups){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnGroups = {
+                data: groups
+            }
+            res.status(200).send(returnGroups);
         })
     })
 }
