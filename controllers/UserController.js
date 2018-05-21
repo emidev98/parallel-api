@@ -120,10 +120,12 @@ module.exports.modifyUser = function(userId, user, callback){
             userDb.email = user.email;
         if (user.languages)
             userDb.language = user.language;
-        if (user.style.backgroundImage)
-            userDb.style.backgroundImage = user.style.backgroundImage;
-        if (user.style.isGridView)
-            userDb.style.isGridView = user.style.isGridView;
+        if (user.style){
+            if (user.style.backgroundImage)
+                userDb.style.backgroundImage = user.style.backgroundImage;
+            if (user.style.isGridView)
+                userDb.style.isGridView = user.style.isGridView;
+        }
 
         userDb.save(function(err, userSaved){
             if(err) {
@@ -254,6 +256,7 @@ function createKeyPair(user){
 			userIds: [{name: user.firstName, email: user.email}],
 			curve: "p256"
 		};
+        console.log(keyOption.userIds);
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publicKey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;

@@ -46,6 +46,7 @@ module.exports.createAccount = function(userEmail, account, callback){
                     var error = new CustomError(errorInfo);
                     return callback(error, undefined);
                 }
+                savedAccount.password = account.password;
                 callback(null, savedAccount);
             })
         });
@@ -143,7 +144,9 @@ module.exports.deleteAccount = function(accountId, callback){
                 var error = new CustomError(errorInfo);
                 return callback(error, undefined);
             }
-            return callback(null, resAccount);
+            CryptoUser.getPrivateKey(resAccount.userId).then((privkey) => {
+                decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
+            });
         })
     })
 }
@@ -207,6 +210,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                             var error = new CustomError(errorInfo);
                             return callback(error, undefined);
                         }
+                        savedAccount.password = account.password;
                         callback(null, savedAccount);
                     })
                 })
@@ -221,6 +225,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                         var error = new CustomError(errorInfo);
                         return callback(error, undefined);
                     }
+                    savedAccount.password = account.password;
                     callback(null, savedAccount);
                 })
             }
