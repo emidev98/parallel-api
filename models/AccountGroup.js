@@ -4,7 +4,7 @@ var conn      = mongoose.createConnection('mongodb://readerWritterUsersDb:Parale
 var ObjectId  = mongoose.Schema.Types.ObjectId;
 
 var AccountGroupsSchema = new Schema({
-    userGroupId: Number,
+    index: Number,
     userId: ObjectId,
     image: String,
     name: String

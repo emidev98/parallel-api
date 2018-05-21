@@ -20,12 +20,13 @@ module.exports.createGroup = function(userEmail, group, callback){
         }
         var accountGroup = new AccountGroup();
         user.maxAccountGroupId(function(max){
-            accountGroup.userGroupId = max + 1;
+            accountGroup.index = max + 1;
             accountGroup.userId = user._id;
             accountGroup.image = group.image;
             accountGroup.name = group.name;
             accountGroup.save(function(err, accountGroupSaved){
                 if (err){
+                    console.log(err);
                     var errorInfo = {
                         status : 500,
                         errorCode : errorCodes.INTERNAL_ERROR,

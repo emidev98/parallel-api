@@ -5,12 +5,13 @@ var ObjectId  = mongoose.Schema.Types.ObjectId;
 
 var AccountsSchema = new Schema({
     userId: ObjectId,
-    userGroupId: Number,
+    groupId: Number,
     title: String,
     image: String,
     description: String,
     user: String,
-    password: String
+    password: String,
+    index: Number
 }, {collection: "accounts"});
 
 module.exports = conn.model('Account', AccountsSchema);
