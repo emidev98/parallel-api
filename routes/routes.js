@@ -162,6 +162,24 @@ module.exports = function(app){
         });
     });
 
+    app.get('/accounts/:id', function(req, res){
+        var userEmail = req.get('email');
+        var accountId = req.params.id;
+        Account.getAccountInfo(userEmail, accountId, function(err, account){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var responseReturn = {
+                data : account
+            }
+            res.status(200).send(responseReturn);
+        })
+    })
+
     app.put('/accounts', function(req, res){
         var userEmail = req.get('email');
         Account.createAccount(userEmail, req.body, function(err, account){
