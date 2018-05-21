@@ -8,11 +8,11 @@ var errorCodes  = require('../responses/errorCodes');
 var privatekey  = "";
 var publickey   = "";
 
-fs.readFile("/home/paralel/paralelAPI/key.pem", function(err, data){
+fs.readFile("/home/ciscu/git/key.pem", function(err, data){
     privatekey = data.toString();
     privatekey = openpgp.key.readArmored(privatekey).keys[0];
 });
-fs.readFile("/home/paralel/paralelAPI/public.pem", function(err, data){
+fs.readFile("/home/ciscu/git/public.pem", function(err, data){
     publickey = data.toString();
     publickey = openpgp.key.readArmored(publickey);
 });
