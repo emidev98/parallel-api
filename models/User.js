@@ -4,15 +4,19 @@ var AccountGroup = require('./AccountGroup');
 var conn         = mongoose.createConnection('mongodb://readerWritterUsersDb:ParalelUsersDbRandW@localhost/users?authSource=users');
 
 var UsersSchema = new Schema({
+    image: String,
     publicKey: {type: String, unique: true},
     token: String,
-    image: String,
     firstName: String,
     lastName: String,
     email: {type: String, unique: true},
     age: Number,
     password: String,
     language: {type: String, default: "ES"},
+    style: {
+        backgroundImage: String,
+        isGridView: Boolean
+    }
 }, { collection : 'users' });
 
 UsersSchema.methods.maxAccountGroupId = function(callback) {
