@@ -10,7 +10,6 @@ var CryptoUserController    = require('./CryptoUserController');
 var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
-var ObjectId                = mongoose.Schema.Types.ObjectId;
 var saltRounds              = 10;
 
 
@@ -72,7 +71,7 @@ module.exports.login = function (user, callback){
 
 module.exports.getUser = function(userId, callback){
     User.findOne({
-        _id: ObjectId(userId)
+        _id: userId
     }, function(err, user){
         if(err) {
             var errorInfo = {
@@ -93,6 +92,82 @@ module.exports.getUser = function(userId, callback){
             return callback(passwordNotMatchError, undefined);
         }
         callback(null, user)
+    })
+}
+
+module.exports.modifyUser = function(userId, user, callback){
+    User.findOne({
+        _id: userId
+    }, function(err, userDb){
+        if(err) {
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+
+        if (user.image)
+            userDb.image = user.image;
+        if (user.firstName)
+            userDb.firstName = user.firstName;
+        if (user.lastName)
+            userDb.lastName = user.lastName;
+        if (user.age)
+            userDb.age = user.age;
+        if (user.email)
+            userDb.email = user.email;
+        if (user.languages)
+            userDb.language = user.language;
+        if (user.style.backgroundImage)
+            userDb.style.backgroundImage = user.style.backgroundImage;
+        if (user.style.isGridView)
+            userDb.style.isGridView = user.style.isGridView;
+
+        userDb.save(function(err, userSaved){
+            if(err) {
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return callback(error, undefined);
+            }
+            callback(null, userSaved);
+        })
+    })
+}
+
+module.exports.deleteUser = function(userId, callback){
+    var resUser;
+    User.findOne({
+        _id: userId
+    }, function(err, user){
+        if (err){
+            var errorInfo = {
+                status : 500,
+                errorCode : errorCodes.INTERNAL_ERROR,
+                errorKey : "ERRORS.INTERNAL_ERROR"
+            }
+            var error = new CustomError(errorInfo);
+            return callback(error, undefined);
+        }
+        resUser = user;
+        user.remove(function(err){
+            if (err){
+                var errorInfo = {
+                    status : 500,
+                    errorCode : errorCodes.INTERNAL_ERROR,
+                    errorKey : "ERRORS.INTERNAL_ERROR"
+                }
+                var error = new CustomError(errorInfo);
+                return callback(error, undefined);
+            }
+            return callback(null, resUser);
+        })
     })
 }
 

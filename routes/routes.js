@@ -76,11 +76,69 @@ module.exports = function(app){
                 age: user.age,
                 email: user.email,
                 password: user.password,
-                language: user.language
+                language: user.language,
+                style: {
+                    backgroundImage: user.image,
+                    isGridView: user.isGridView
+                }
             }
             res.status(200).send(returnUser);
         })
     });
+
+    app.post('/user/:id', function(req, res){
+        User.modifyUser(req.params.id, req.body, function(err, user){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnUser = {
+                success:{
+                    successCode: successCodes.USER_SUCCESSFULLY_MODIFIED,
+                    successKey: "SUCCESS.USER_SUCCESSFULLY_MODIFIED"
+                },
+                data: {
+                    image: user.image,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    age: user.age,
+                    email: user.email,
+                    password: user.password,
+                    language: user.language,
+                    style: {
+                        backgroundImage: user.style.backgroundImage,
+                        isGridView: user.style.isGridView
+                    }
+                }
+            }
+            res.status(200).send(returnUser);
+        })
+    })
+
+    app.delete('/user/:id', function(req, res){
+        User.deleteUser(req.params.id, function(err, user){
+            if (err) {
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var returnUser = {
+                success:{
+                    successCode: successCodes.USER_SUCCESSFULLY_DELETED,
+                    successKey: "SUCCESS.USER_SUCCESSFULLY_DELETED"
+                },
+                data: {
+                    id: user._id
+                }
+            }
+            res.status(200).send(returnUser);
+        })
+    })
 
     /*********************
     * ACCOUNTS ROUTES ****
