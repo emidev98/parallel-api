@@ -13,6 +13,7 @@ var UsersSchema = new Schema({
     age: Number,
     password: String,
     language: {type: String, default: "ES"},
+    googleId: String,
     style: {
         backgroundImage: String,
         isGridView: Boolean
