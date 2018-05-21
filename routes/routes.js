@@ -34,9 +34,11 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(errorStatus);
             }
+            var tokenmail = user.token+"|"+user.email;
+            var authorization = Buffer.from(tokenmail).toString('base64');
             var responseObject = {
                 id : user._id,
-                token : user.token,
+                token : authorization,
             }
             res.status(200).send(responseObject);
         });
@@ -52,9 +54,11 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(error);
             }
+            var tokenmail = userDB.token+"|"+userDB.email;
+            var authorization = Buffer.from(tokenmail).toString('base64');
             var returnUser = {
                 id : userDB._id,
-                token: userDB.token,
+                token: authorization,
             }
             res.status(200).send(returnUser);
         });

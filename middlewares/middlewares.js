@@ -13,17 +13,18 @@ module.exports.replaceUrl = function(req, res, next){
 }
 
 module.exports.hasAccess = function(req, res, next){
-	if(true){ //_.contains(anonymousAllowedRoutes, req.url.substring(1, 5))
+	console.log(req.url);
+	if(_.include(anonymousAllowedRoutes, req.url.substring(1, 5))){
 		req.url = req.url.replace(replaceUrlText[AUTH], "");
-		req.url = req.url.replace(replaceUrlText[PORTAL], "");
         next();
     } else {
+		var TOKEN = 0;
+		var EMAIL = 1;
 		req.url = req.url.replace(replaceUrlText[PORTAL], "");
 		var authentication = req.get('Authorization');
-		var authenticationString = Buffer.from(authentication, 'base64').toString('utf8');
-	    var tokenString = authenticationString.slice(0, 16);
-	    var emailString = authenticationString.slice(16);
-
+		var authenticationArray = Buffer.from(authentication, 'base64').toString('utf8').split("|");
+	    var tokenString = authenticationArray[TOKEN];
+	    var emailString = authenticationArray[EMAIL];
 		User.isLogged(tokenString, emailString, function(err, user){
 			if(err){
 				var errorStatus = {
