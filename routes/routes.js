@@ -231,7 +231,7 @@ module.exports = function(app){
                 returnAccounts[i] = {
                     id: accounts[i]._id,
                     groupId: accounts[i].groupId,
-                    title: accounts[i].title,
+                    name: accounts[i].name,
                     image: accounts[i].image,
                     description: accounts[i].description,
                     user: accounts[i].user,
@@ -284,7 +284,7 @@ module.exports = function(app){
                 data: {
                     id: account._id,
                     groupId: account.groupId,
-                    title : account.title,
+                    name : account.name,
                     image : account.image,
                     description : account.description,
                     user : account.user,
@@ -314,7 +314,7 @@ module.exports = function(app){
                 data: {
                     id: account._id,
                     groupId: account.groupId,
-                    title : account.title,
+                    name : account.name,
                     image : account.image,
                     description : account.description,
                     user : account.user,
@@ -344,7 +344,7 @@ module.exports = function(app){
                 },
                 data: {
                     groupId: account.groupId,
-                    title : account.title,
+                    name : account.name,
                     image : account.image,
                     description : account.description,
                     user : account.user,

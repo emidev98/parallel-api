@@ -6,7 +6,7 @@ var ObjectId  = mongoose.Schema.Types.ObjectId;
 var AccountsSchema = new Schema({
     userId: ObjectId,
     groupId: Number,
-    title: String,
+    name: String,
     image: String,
     description: String,
     user: String,

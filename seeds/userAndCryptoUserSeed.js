@@ -43,7 +43,7 @@ user.save(function (err, user) {
           {
               groupId: 1,
               userId: ObjectId("5b04360c4e018a125247a88a"),
-              title: "Facebook",
+              name: "Facebook",
               image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
               description: "descriptiontest",
               user: "facebookUser",
@@ -59,7 +59,7 @@ user.save(function (err, user) {
           {
               groupId: 1,
               userId: ObjectId("5b04360c4e018a125247a88a"),
-              title: "Twitter",
+              name: "Twitter",
               image: "http://kb4images.com/images/image/37185176-image.jpg",
               description: "descriptiontest",
               user: "facebookUser3",
@@ -73,7 +73,7 @@ user.save(function (err, user) {
       });
       var accountGroup2 = new AccountGroup(
           {
-              userGroupId: 2,
+              groupId: 2,
               userId: ObjectId("5b04360c4e018a125247a88a"),
               image: "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg",
               name: "accountGroupTest",
@@ -87,7 +87,7 @@ user.save(function (err, user) {
           {
               groupId: 2,
               userId: ObjectId("5b04360c4e018a125247a88a"),
-              title: "Facebook",
+              name: "Facebook",
               image: "https://www.codeproject.com/KB/GDI-plus/ImageProcessing2/img.jpg",
               description: "descriptiontest",
               user: "facebookUser",

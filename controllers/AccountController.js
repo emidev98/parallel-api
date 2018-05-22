@@ -26,7 +26,7 @@ module.exports.createAccount = function(userEmail, account, callback){
             var newAccount = new Account({
                 userId: user._id,
                 groupId: account.groupId,
-                title: account.title,
+                name: account.name,
                 image: account.image,
                 description: account.description,
                 user: account.user,
@@ -57,7 +57,7 @@ module.exports.getAllAccounts = function(userEmail, callback){
         var requestUserId = user._id;
         Account.find({
             userId: requestUserId
-        }, 'groupId title image description user index', function(err, accounts){
+        }, 'groupId name image description user index', function(err, accounts){
             if (err){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
@@ -138,8 +138,8 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
             if (account.groupId)
                 accountDb.groupId = account.groupId;
 
-            if (account.title)
-                accountDb.title = account.title;
+            if (account.name)
+                accountDb.name = account.name;
 
             if (account.image)
                 accountDb.image = account.image;
