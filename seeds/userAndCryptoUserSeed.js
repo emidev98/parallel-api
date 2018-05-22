@@ -30,7 +30,7 @@ user.save(function (err, user) {
       var accountGroup = new AccountGroup (
           {
               index: 1,
-              userId: ObjectId("5b0444b900f87f1348b55fed")
+              userId: ObjectId("5b0444b900f87f1348b55fed"),
               image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
               name: "Default",
           }
@@ -74,7 +74,7 @@ user.save(function (err, user) {
       var accountGroup2 = new AccountGroup(
           {
               index: 2,
-              userId: ObjectId("5b0444b900f87f1348b55fed")
+              userId: ObjectId("5b0444b900f87f1348b55fed"),
               image: "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg",
               name: "accountGroupTest",
           }
