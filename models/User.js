@@ -1,6 +1,7 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 var AccountGroup = require('./AccountGroup');
+var CustomError  = require('../responses/CustomError');
 var conn         = mongoose.createConnection('mongodb://readerWritterUsersDb:ParalelUsersDbRandW@localhost/users?authSource=users');
 
 var UsersSchema = new Schema({
