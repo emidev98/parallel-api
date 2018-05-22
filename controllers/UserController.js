@@ -247,15 +247,15 @@ function createKeyPair(user){
 function saveNewUser(user, privkey){
 	return new Promise(function(resolve, reject) {
         user.token = randtoken.generate(16);
-		User.create(user, function(err, savedUser){
+        user.styles = {
+            backgroundImage : "",
+            isGridView : true,
+            image : "",
+        };
+        User.create(user, function(err, savedUser){
 			if(err){
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
-            user.styles = {
-                backgroundImage : "",
-                isGridView : true,
-                image : "",
-            };
             var defaultAccountGroup = new AccountGroup({
                 index: -1,
                 userId: savedUser._id,
