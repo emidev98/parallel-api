@@ -30,7 +30,7 @@ user.save(function (err, user) {
       var accountGroup = new AccountGroup (
           {
               index: 1,
-              userId: ObjectId("5b04360c4e018a125247a88a"),
+              userId: ObjectId("5b0444b900f87f1348b55fed")
               image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
               name: "Default",
           }
@@ -42,7 +42,7 @@ user.save(function (err, user) {
       var account = new Account(
           {
               groupId: 1,
-              userId: ObjectId("5b04360c4e018a125247a88a"),
+              userId: ObjectId("5b0444b900f87f1348b55fed"),
               name: "Facebook",
               image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
               description: "descriptiontest",
@@ -58,7 +58,7 @@ user.save(function (err, user) {
       var account2 = new Account(
           {
               groupId: 1,
-              userId: ObjectId("5b04360c4e018a125247a88a"),
+              userId: ObjectId("5b0444b900f87f1348b55fed"),
               name: "Twitter",
               image: "http://kb4images.com/images/image/37185176-image.jpg",
               description: "descriptiontest",
@@ -73,8 +73,8 @@ user.save(function (err, user) {
       });
       var accountGroup2 = new AccountGroup(
           {
-              groupId: 2,
-              userId: ObjectId("5b04360c4e018a125247a88a"),
+              index: 2,
+              userId: ObjectId("5b0444b900f87f1348b55fed")
               image: "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg",
               name: "accountGroupTest",
           }
@@ -86,7 +86,7 @@ user.save(function (err, user) {
       var account3 = new Account(
           {
               groupId: 2,
-              userId: ObjectId("5b04360c4e018a125247a88a"),
+              userId: ObjectId("5b0444b900f87f1348b55fed"),
               name: "Facebook",
               image: "https://www.codeproject.com/KB/GDI-plus/ImageProcessing2/img.jpg",
               description: "descriptiontest",
