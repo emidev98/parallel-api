@@ -27,6 +27,26 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.PASSWORD_DO_NOT_MATCH;
             this.errorKey = "ERRORS.PASSWORD_DO_NOT_MATCH";
             break;
+        case errorCodes.USER_NOT_FOUND:
+            this.status = 404;
+            this.errorCode = errorCodes.USER_NOT_FOUND;
+            this.errorKey = "ERRORS.USER_NOT_FOUND";
+            break;
+        case errorCodes.ACCOUNT_NOT_FOUND:
+            this.status = 404;
+            this.errorCode = errorCodes.ACCOUNT_NOT_FOUND;
+            this.errorKey = "ERRORS.ACCOUNT_NOT_FOUND";
+            break;
+        case errorCodes.GROUP_NOT_FOUND:
+            this.status = 404;
+            this.errorCode = errorCodes.GROUP_NOT_FOUND;
+            this.errorKey = "ERRORS.GROUP_NOT_FOUND";
+            break;
+        case errorCodes.CRYPTO_USER_NOT_FOUND:
+            this.status = 404;
+            this.errorCode = errorCodes.CRYPTO_USER_NOT_FOUND;
+            this.errorKey = "ERRORS.CRYPTO_USER_NOT_FOUND";
+            break;
   }
 };
 

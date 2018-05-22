@@ -13,6 +13,9 @@ module.exports.createAccount = function(userEmail, account, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
         var publicKey = user.publicKey;
         var options = {
             data: account.password,                             // input as String (or Uint8Array)
@@ -48,6 +51,9 @@ module.exports.getAllAccounts = function(userEmail, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
         var requestUserId = user._id;
         Account.find({
             userId: requestUserId
@@ -67,11 +73,17 @@ module.exports.getAccountInfo = function(userEmail, accountId, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
         Account.findOne({
             _id: accountId
         }, function(err, account){
             if (err){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+            }
+            if (!account){
+                return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
             }
             CryptoUser.getPrivateKey(user._id)
             .then(plaintext => decryptPassoword(plaintext, account))
@@ -88,6 +100,9 @@ module.exports.deleteAccount = function(accountId, callback){
     }, function(err, account){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!account){
+            return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
         }
         resAccount = account;
         account.remove(function(err){
@@ -108,11 +123,17 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
         Account.findOne({
             _id: accountId
         }, function(err, accountDb){
             if (err){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+            }
+            if (!account){
+                return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
             }
             if (account.groupId)
                 accountDb.groupId = account.groupId;

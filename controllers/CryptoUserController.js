@@ -46,6 +46,9 @@ module.exports.getPrivateKey = function(userId){
             if(err){
                 return reject(new CustomError(errorCodes.INTERNAL_ERROR));
             }
+            if (!privKey){
+                return reject(new CustomError(errorCodes.CRYPTO_USER_NOT_FOUND));
+            }
             decryptOptions = {
                 message: openpgp.message.readArmored(privKey.privateKey),
                 privateKeys: [privatekey]

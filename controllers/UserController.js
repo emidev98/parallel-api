@@ -95,7 +95,7 @@ module.exports.getUser = function(userId, callback){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if (!user){
-            return callback(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD), undefined);
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         callback(null, user)
     })
@@ -107,6 +107,9 @@ module.exports.modifyUser = function(userId, user, callback){
     }, function(err, userDb){
         if(err) {
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!userDb){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         if (user.image)
             userDb.image = user.image;
@@ -180,6 +183,9 @@ module.exports.deleteUser = function(userId, callback){
     }, function(err, user){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         resUser = user;
         user.remove(function(err){
@@ -272,7 +278,7 @@ function saveNewUser(user, privkey){
 
 function checkUserEmail(user){
 	return new Promise(function (resolve, reject){
-		var userDB = User.findOne({
+		User.findOne({
 			email: user.email
 		}, function (err, userDB){
             if(err) {

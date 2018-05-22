@@ -12,6 +12,9 @@ module.exports.createGroup = function(userEmail, group, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
         var accountGroup = new AccountGroup();
         user.maxAccountGroupId(function(max){
             accountGroup.index = max + 1;
@@ -35,6 +38,9 @@ module.exports.modifyGroup = function(groupId, groupInfo, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!group){
+            return callback(new CustomError(errorCodes.GROUP_NOT_FOUND), undefined);
+        }
         if (groupInfo.name)
             group.name = groupInfo.name;
         if (groupInfo.image)
@@ -56,6 +62,9 @@ module.exports.deleteGroup = function(groupId, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!group){
+            return callback(new CustomError(errorCodes.GROUP_NOT_FOUND), undefined);
+        }
         resGroup = group;
         group.remove(function(err){
             if (err){
@@ -73,6 +82,9 @@ module.exports.findOneGroup = function(groupId, callback){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
+        if (!group){
+            return callback(new CustomError(errorCodes.GROUP_NOT_FOUND), undefined);
+        }
         callback(null, group);
     })
 }
@@ -83,6 +95,9 @@ module.exports.findAll = function(userEmail, callback){
     }, function(err, user){
         if (err){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         AccountGroup.find({
             userId: user._id
