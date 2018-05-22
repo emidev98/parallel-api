@@ -21,22 +21,10 @@ module.exports.isLogged = function(tokenString, emailString, callback){
         email: emailString
     }, function(err, user){
         if(err) {
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if(user === null){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INCORRECT_TOKEN,
-                errorKey : "ERRORS.INCORRECT_TOKEN"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined);
         }
         else callback(null, user);
     })
@@ -46,13 +34,7 @@ module.exports.register = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
     if(user.password.toString() != user.repeatPassword.toString()){
-        var errorInfo = {
-            status : 500,
-            errorCode : errorCodes.PASSWORD_DO_NOT_MATCH,
-            errorKey : "ERRORS.PASSWORD_DO_NOT_MATCH"
-        }
-        var error = new CustomError(errorInfo);
-        return callback(error, undefined);
+        return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
     }
     checkNewUserEmail(user)
     .then(user => createHash(user))
@@ -74,22 +56,10 @@ module.exports.getUser = function(userId, callback){
         _id: userId
     }, function(err, user){
         if(err) {
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if (!user){
-            var error = {
-                status: 404,
-                errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-                errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
-            };
-            var passwordNotMatchError = new CustomError(error);
-            return callback(passwordNotMatchError, undefined);
+            return callback(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD), undefined);
         }
         callback(null, user)
     })
@@ -100,13 +70,7 @@ module.exports.modifyUser = function(userId, user, callback){
         _id: userId
     }, function(err, userDb){
         if(err) {
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if (user.image)
             userDb.image = user.image;
@@ -129,13 +93,7 @@ module.exports.modifyUser = function(userId, user, callback){
 
         userDb.save(function(err, userSaved){
             if(err) {
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             callback(null, userSaved);
         })
@@ -179,24 +137,12 @@ module.exports.deleteUser = function(userId, callback){
         _id: userId
     }, function(err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         resUser = user;
         user.remove(function(err){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             return callback(null, resUser);
         })
@@ -209,22 +155,10 @@ function checkNewUserEmail(user){
 			email: user.email
 		}, function(err, users){
 			if(err) {
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-				var error = new CustomError(errorInfo);
-				return reject(error);
+				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			if(users.length > 0){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.DUPLICATED_USER,
-                    errorKey : "ERRORS.DUPLICATED_USER"
-                }
-				var userFindError = new CustomError(errorInfo);
-				return reject(userFindError);
+				return reject(new CustomError(errorCodes.DUPLICATED_USER));
 			}
 			resolve(user);
 		})
@@ -236,13 +170,7 @@ function createHash(user){
 		var plainHash = user.password + user.email.split("@", 1)[0];
 		bcrypt.hash(plainHash, saltRounds, function(err, hash){
 			if(err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-				var error = new CustomError(errorInfo);
-				return reject(error);
+				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			user.password = hash;
 			resolve(user);
@@ -273,13 +201,7 @@ function saveNewUser(user, privkey){
         user.token = randtoken.generate(16);
 		User.create(user, function(err, savedUser){
 			if(err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-				var error = new CustomError(errorInfo);
-				return reject(error);
+				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
             var defaultAccountGroup = new AccountGroup({
                 index: -1,
@@ -289,13 +211,7 @@ function saveNewUser(user, privkey){
             });
             defaultAccountGroup.save(function(err, accountGroup){
                 if (err){
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-                    var error = new CustomError(errorInfo);
-                    return reject(error);
+                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
                 var newCryptoUser = {
     				userId: savedUser._id,
@@ -318,22 +234,10 @@ function checkUserEmail(user){
 			email: user.email
 		}, function (err, userDB){
             if(err) {
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-				var error = new CustomError(errorInfo);
-				return reject(error);
+				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			if (!userDB){
-				var error = {
-					status: 404,
-					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-					errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
-				};
-				var userNotFoundError = new CustomError(error);
-				return reject(userNotFoundError);
+				return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
 			}
 			var users = [user, userDB];
 			resolve(users);
@@ -347,22 +251,10 @@ function compareHash(users){
 	return new Promise(function (resolve, reject){
         bcrypt.compare(users[USER_FRONT_END].password + users[USER_FRONT_END].email.split("@", 1)[0], users[USER_DB].password, function(err, res) {
             if(err) {
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-				var error = new CustomError(errorInfo);
-				return reject(error);
+				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			if (!res){
-				var error = {
-					status: 404,
-					errorCode: errorCodes.INCORRECT_USER_OR_PASSWORD,
-					errorKey: "ERRORS.INCORRECT_USER_OR_PASSWORD"
-				};
-				var passwordNotMatchError = new CustomError(error);
-				return reject(passwordNotMatchError);
+				return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
 			}
 			resolve(users[USER_DB]);
 		});

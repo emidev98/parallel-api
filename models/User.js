@@ -27,13 +27,7 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
         .exec(function(err, doc)
             {
                 if (err){
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-    				var error = new CustomError(errorInfo);
-    				return callback(error);
+    				return callback(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
                 max = doc.index;
                 callback(max);

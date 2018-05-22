@@ -30,13 +30,7 @@ module.exports.saveCryptoUser = function(newCryptoUser){
             newCryptoUser.privateKey = privkeyencrypted;
             CryptoUser.create(newCryptoUser, function(err, cryptoUser){
                 if(err){
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-                    var error = new CustomError(errorInfo);
-                    return reject(error);
+                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
                 resolve(cryptoUser);
             });
@@ -50,13 +44,7 @@ module.exports.getPrivateKey = function(userId){
             userId: userId
         }, function(err, privKey){
             if(err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return reject(error);
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
             }
             decryptOptions = {
                 message: openpgp.message.readArmored(privKey.privateKey),

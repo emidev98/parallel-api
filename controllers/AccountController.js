@@ -11,13 +11,7 @@ module.exports.createAccount = function(userEmail, account, callback){
         email: userEmail
     }, function (err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         var publicKey = user.publicKey;
         var options = {
@@ -38,13 +32,7 @@ module.exports.createAccount = function(userEmail, account, callback){
             });
             newAccount.save(function(err, savedAccount){
                 if (err){
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-                    var error = new CustomError(errorInfo);
-                    return callback(error, undefined);
+                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                 }
                 savedAccount.password = account.password;
                 callback(null, savedAccount);
@@ -58,28 +46,14 @@ module.exports.getAllAccounts = function(userEmail, callback){
         email: userEmail
     }, function(err, user){
         if (err){
-            console.log(err)
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         var requestUserId = user._id;
         Account.find({
             userId: requestUserId
         }, 'groupId title image description user index', function(err, accounts){
             if (err){
-                console.log(err)
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             return callback(null, accounts);
         });
@@ -91,25 +65,13 @@ module.exports.getAccountInfo = function(userEmail, accountId, callback){
         email: userEmail
     }, function(err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         Account.findOne({
             _id: accountId
         }, function(err, account){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             CryptoUser.getPrivateKey(user._id)
             .then(plaintext => decryptPassoword(plaintext, account))
@@ -125,24 +87,12 @@ module.exports.deleteAccount = function(accountId, callback){
         _id: accountId
     }, function(err, account){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         resAccount = account;
         account.remove(function(err){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             CryptoUser.getPrivateKey(resAccount.userId).then((privkey) => {
                 decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
@@ -156,25 +106,13 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
         email: userEmail
     }, function(err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         Account.findOne({
             _id: accountId
         }, function(err, accountDb){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             if (account.groupId)
                 accountDb.groupId = account.groupId;
@@ -202,13 +140,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
                     accountDb.password = ciphertext.data;
                     accountDb.save(function(err, savedAccount){
                         if (err){
-                            var errorInfo = {
-                                status : 500,
-                                errorCode : errorCodes.INTERNAL_ERROR,
-                                errorKey : "ERRORS.INTERNAL_ERROR"
-                            }
-                            var error = new CustomError(errorInfo);
-                            return callback(error, undefined);
+                            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                         }
                         savedAccount.password = account.password;
                         callback(null, savedAccount);
@@ -217,13 +149,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
             } else {
                 accountDb.save(function(err, savedAccount){
                     if (err){
-                        var errorInfo = {
-                            status : 500,
-                            errorCode : errorCodes.INTERNAL_ERROR,
-                            errorKey : "ERRORS.INTERNAL_ERROR"
-                        }
-                        var error = new CustomError(errorInfo);
-                        return callback(error, undefined);
+                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                     }
                     savedAccount.password = account.password;
                     callback(null, savedAccount);

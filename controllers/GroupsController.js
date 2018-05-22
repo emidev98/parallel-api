@@ -10,13 +10,7 @@ module.exports.createGroup = function(userEmail, group, callback){
         email: userEmail
     }, function(err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         var accountGroup = new AccountGroup();
         user.maxAccountGroupId(function(max){
@@ -26,14 +20,7 @@ module.exports.createGroup = function(userEmail, group, callback){
             accountGroup.name = group.name;
             accountGroup.save(function(err, accountGroupSaved){
                 if (err){
-                    console.log(err);
-                    var errorInfo = {
-                        status : 500,
-                        errorCode : errorCodes.INTERNAL_ERROR,
-                        errorKey : "ERRORS.INTERNAL_ERROR"
-                    }
-                    var error = new CustomError(errorInfo);
-                    return callback(error, undefined);
+                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                 }
                 callback(null, accountGroupSaved);
             });
@@ -46,13 +33,7 @@ module.exports.modifyGroup = function(groupId, groupInfo, callback){
         _id: groupId
     }, function(err, group){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if (groupInfo.name)
             group.name = groupInfo.name;
@@ -60,13 +41,7 @@ module.exports.modifyGroup = function(groupId, groupInfo, callback){
             group.image = groupInfo.image;
         group.save(function(err, groupSaved){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             callback(null, groupSaved);
         })
@@ -79,24 +54,12 @@ module.exports.deleteGroup = function(groupId, callback){
         _id: groupId
     }, function(err, group){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         resGroup = group;
         group.remove(function(err){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             return callback(null, resGroup);
         })
@@ -108,13 +71,7 @@ module.exports.findOneGroup = function(groupId, callback){
         _id: groupId
     }, function(err, group){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         callback(null, group);
     })
@@ -125,25 +82,13 @@ module.exports.findAll = function(userEmail, callback){
         email: userEmail
     }, function(err, user){
         if (err){
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         AccountGroup.find({
             userId: user._id
         }, function(err, groups){
             if (err){
-                var errorInfo = {
-                    status : 500,
-                    errorCode : errorCodes.INTERNAL_ERROR,
-                    errorKey : "ERRORS.INTERNAL_ERROR"
-                }
-                var error = new CustomError(errorInfo);
-                return callback(error, undefined);
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             callback(null, groups);
         })
