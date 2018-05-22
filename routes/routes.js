@@ -37,8 +37,10 @@ module.exports = function(app){
             var tokenmail = user.token+"|"+user.email;
             var authorization = Buffer.from(tokenmail).toString('base64');
             var responseObject = {
-                id : user._id,
-                token : authorization,
+                data: {
+                    id : user._id,
+                    token : authorization,
+                }
             }
             res.status(200).send(responseObject);
         })
@@ -56,9 +58,12 @@ module.exports = function(app){
             var tokenmail = user.token+"|"+user.email;
             var authorization = Buffer.from(tokenmail).toString('base64');
             var responseObject = {
-                id : user._id,
-                token : authorization,
+                data: {
+                    id : user._id,
+                    token : authorization,
+                }
             }
+
             res.status(200).send(responseObject);
         });
     });
