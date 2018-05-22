@@ -28,6 +28,7 @@ module.exports = function(app){
     app.put('/google-sign-in', function(req, res) {
         User.googleSignIn(req.body, function(err, user){
             if(err){
+                console.log("1");
                 var errorStatus = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -49,6 +50,7 @@ module.exports = function(app){
     app.put('/register', function(req, res){
         User.register(req.body, function(err, user){
             if(err){
+                console.log("2");
                 var errorStatus = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -72,6 +74,7 @@ module.exports = function(app){
     app.post('/login', function(req, res){
         User.login(req.body, function(err, userDB){
             if (err) {
+                console.log("3");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -93,6 +96,7 @@ module.exports = function(app){
     app.get('/user/:id', function(req, res){
         User.getUser(req.params.id, function(err, user){
             if (err) {
+                console.log("4");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -121,6 +125,7 @@ module.exports = function(app){
     app.post('/user/:id', function(req, res){
         User.modifyUser(req.params.id, req.body, function(err, user){
             if (err) {
+                console.log("5");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -153,6 +158,7 @@ module.exports = function(app){
     app.delete('/user/:id', function(req, res){
         User.deleteUser(req.params.id, function(err, user){
             if (err) {
+                console.log("6");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -172,6 +178,38 @@ module.exports = function(app){
         })
     })
 
+    app.post('/user/change-password/:id', function(req, res){
+        console.log("In routes");
+        User.changePassword(req.body, req.params.id, function(err, user){
+            if (err) {
+                console.log("7");
+                console.log(err)
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            console.log(user)
+            var returnUser = {
+                success:{
+                    successCode: successCodes.PASSWORD_SUCCESSFULLY_CHANGED,
+                    successKey: "SUCCESS.PASSWORD_SUCCESSFULLY_CHANGED"
+                },
+                data: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    age: user.age,
+                    email : user.email,
+                    password : user.password,
+                    language : user.language,
+                    styles: user.styles
+                }
+            }
+            res.status(200).send(returnUser);
+        })
+    })
+
     /*********************
     * ACCOUNTS ROUTES ****
     **********************/
@@ -181,6 +219,7 @@ module.exports = function(app){
         console.log(userEmail);
         Account.getAllAccounts(userEmail, function(err, accounts){
             if (err) {
+                console.log("8");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -212,6 +251,7 @@ module.exports = function(app){
         var accountId = req.params.id;
         Account.getAccountInfo(userEmail, accountId, function(err, account){
             if (err) {
+                console.log("9");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -229,6 +269,7 @@ module.exports = function(app){
         var userEmail = req.get('email');
         Account.createAccount(userEmail, req.body, function(err, account){
             if (err) {
+                console.log("10");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -258,6 +299,7 @@ module.exports = function(app){
     app.delete('/accounts/:id', function(req, res){
         Account.deleteAccount(req.params.id, function(err, account){
             if (err) {
+                console.log("11");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -288,6 +330,7 @@ module.exports = function(app){
         var userEmail = req.get('email');
         Account.modifyAccount(userEmail, req.params.id, req.body, function(err, account){
             if (err) {
+                console.log("12");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -322,6 +365,7 @@ module.exports = function(app){
         var userEmail = req.get('email');
         AccountGroup.createGroup(userEmail, req.body, function(err, group){
             if (err) {
+                console.log("13");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -347,6 +391,7 @@ module.exports = function(app){
     app.post('/groups/:id', function(req, res){
         AccountGroup.modifyGroup(req.params.id, req.body, function(err, group){
             if (err) {
+                console.log("14");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -371,6 +416,7 @@ module.exports = function(app){
     app.delete('/groups/:id', function(req, res){
         AccountGroup.deleteGroup(req.params.id, function(err,group){
             if (err) {
+                console.log("15");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -396,6 +442,7 @@ module.exports = function(app){
     app.get('/groups/:id', function(req, res){
         AccountGroup.findOneGroup(req.params.id, function(err, group){
             if (err) {
+                console.log("16");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -418,6 +465,7 @@ module.exports = function(app){
         var userEmail = req.get('email');
         AccountGroup.findAll(userEmail, function(err, groups){
             if (err) {
+                console.log("17");
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey

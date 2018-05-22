@@ -22,12 +22,14 @@ module.exports.isLogged = function(tokenString, emailString, callback){
         email: emailString
     }, function(err, user){
         if(err) {
+            console.log(err)
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         if(user === null){
             return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined);
         }
-        else callback(null, user);
+        console.log("User is logged");
+        callback(null, user);
     })
 }
 
@@ -141,40 +143,37 @@ module.exports.modifyUser = function(userId, user, callback){
 
 
 
-// module.exports.changePassword = function(requestBody, callback){
-//     var oldPassword = requestBody.actualPassword;
-//     var oldPasswordRepeat = requestBody.actualPasswordRepeat;
-//     if(oldPassword != oldPasswordRepeat){
-//         //TODO: Throw error
-//     }
-//     User.findOne({
-//         email: requestBody.email
-//     }, function(err, userInDb){
-//         if(err) {
-//             var errorInfo = {
-//                 status : 500,
-//                 errorCode : errorCodes.INTERNAL_ERROR,
-//                 errorKey : "ERRORS.INTERNAL_ERROR"
-//             }
-//             var error = new CustomError(errorInfo);
-//             return callback(error, undefined);
-//         }
-//         var frontEndUser = {
-//             email: requestBody.email,
-//             password: requestBody.password
-//         }
-//         var usersForHash = [frontEndUser, userInDb];
-//         compareHash(usersForHash)
-//         .then(userDB => function(){
-//             var newPassword = {
-//                 email: frontEndUser.email,
-//                 password: frontEndUser.newPassword
-//             }
-//             createHash(newPassword)
-//         })
-//         .catch(err => callback(err, undefined))
-//     })
-// }
+module.exports.changePassword = function(requestBody, userId, callback){
+    console.log("Im changind hash");
+    var oldPassword = requestBody.actualPassword;
+    var oldPasswordRepeat = requestBody.actualPasswordRepeat;
+    if(oldPassword != oldPasswordRepeat){
+        return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
+    }
+    User.findOne({
+        email: requestBody.email,
+        _id: userId
+    }, function(err, userInDb){
+        if(err) {
+            console.log(err);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        var oldPasswordUser = {
+            email: requestBody.email,
+            password: requestBody.actualPassword,
+        }
+        var newPasswordUser = {
+            email: requestBody.email,
+            password: requestBody.newPassword
+        }
+        var usersForHash = [oldPasswordUser, userInDb];
+        compareHash(usersForHash)
+        .then(userDB => createHash(newPasswordUser))
+        .then(user => saveNewPassword(userInDb, user.password))
+        .then(userSaved => callback(null, userSaved))
+        .catch(err => callback(err, undefined))
+    })
+}
 
 module.exports.deleteUser = function(userId, callback){
     var resUser;
@@ -214,10 +213,12 @@ function checkNewUserEmail(user){
 }
 
 function createHash(user){
+    console.log("Im creating hash");
 	return new Promise(function(resolve, reject) {
 		var plainHash = user.password + user.email.split("@", 1)[0];
 		bcrypt.hash(plainHash, saltRounds, function(err, hash){
 			if(err){
+                console.log(err);
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			user.password = hash;
@@ -299,11 +300,14 @@ function checkUserEmail(user){
 }
 
 function compareHash(users){
+    console.log(users)
+    console.log("Im comparing hash");
 	var USER_FRONT_END = 0;
 	var USER_DB = 1;
 	return new Promise(function (resolve, reject){
         bcrypt.compare(users[USER_FRONT_END].password + users[USER_FRONT_END].email.split("@", 1)[0], users[USER_DB].password, function(err, res) {
             if(err) {
+                console.log(err);
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
 			if (!res){
@@ -311,5 +315,20 @@ function compareHash(users){
 			}
 			resolve(users[USER_DB]);
 		});
+    })
+}
+
+function saveNewPassword(userInDb, newPassword) {
+    console.log("Im saving user hash");
+    return new Promise(function(resolve, reject){
+        userInDb.password = newPassword;
+        userInDb.save(function(err, userSaved){
+            if(err){
+                console.log(err);
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+            }
+            console.log("This is new user saved changed password: "+userSaved);
+            resolve(userSaved);
+        })
     })
 }
