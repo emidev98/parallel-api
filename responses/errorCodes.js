@@ -7,5 +7,4 @@ module.exports = {
     USER_NOT_FOUND: 500,
     ACCOUNT_NOT_FOUND: 600,
     GROUP_NOT_FOUND: 700,
-    CRYPTO_USER_NOT_FOUND: 800,
 }

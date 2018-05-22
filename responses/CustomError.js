@@ -42,11 +42,6 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.GROUP_NOT_FOUND;
             this.errorKey = "ERRORS.GROUP_NOT_FOUND";
             break;
-        case errorCodes.CRYPTO_USER_NOT_FOUND:
-            this.status = 404;
-            this.errorCode = errorCodes.CRYPTO_USER_NOT_FOUND;
-            this.errorKey = "ERRORS.CRYPTO_USER_NOT_FOUND";
-            break;
   }
 };
 
