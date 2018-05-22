@@ -3,6 +3,8 @@ var AccountGroup = require('../models/AccountGroup');
 var Account = require('../models/Account');
 var Session = require('../models/Session');
 var CryptoUser = require('../models/CryptoUser');
+var mongoose  = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
 
 /*var user = new User(
     {
