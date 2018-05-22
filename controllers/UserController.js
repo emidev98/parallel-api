@@ -13,6 +13,7 @@ var mongoose                = require('mongoose');
 var saltRounds              = 10;
 
 
+
 openpgp.initWorker({ path:'openpgp.worker.js' });
 
 module.exports.isLogged = function(tokenString, emailString, callback){
@@ -27,6 +28,41 @@ module.exports.isLogged = function(tokenString, emailString, callback){
             return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined);
         }
         else callback(null, user);
+    })
+}
+
+module.exports.googleSignIn = function(user, callback){
+    var USER = 0;
+    var PRIVKEY = 1;
+    User.findOne({
+        email: user.email
+    }, function(err, dbUser) {
+        if(err){
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if(!dbUser){
+            console.log(user);
+            user.googleId = user.id;
+            user.style = {
+                image : user.image
+            }
+            createKeyPair(user)
+            .then(resolveReturn => saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+            .then(savedUser => callback(null, savedUser))
+            .catch(err => callback(err, undefined))
+        } else {
+            User.findOne({
+                _id : user.id
+            }, function(err, idValidatedUser){
+                if(err){
+                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                }
+                if(!idValidatedUser){
+    				return callback(new CustomError(errorCodes.DUPLICATED_USER), undefined);
+                }
+                callback(null, dbUser);
+            })
+        }
     })
 }
 
@@ -102,34 +138,40 @@ module.exports.modifyUser = function(userId, user, callback){
 
 
 
-/*module.exports.changePassword = function(requestBody, callback){
-    var oldPassword = requestBody.actualPassword;
-    var oldPasswordRepeat = requestBody.actualPasswordRepeat;
-    if(oldPassword != oldPasswordRepeat){
-        //TODO: Throw error
-    }
-    User.findOne({
-        email: requestBody.email
-    }, function(err, userInDb){
-        if(err) {
-            var errorInfo = {
-                status : 500,
-                errorCode : errorCodes.INTERNAL_ERROR,
-                errorKey : "ERRORS.INTERNAL_ERROR"
-            }
-            var error = new CustomError(errorInfo);
-            return callback(error, undefined);
-        }
-        var frontEndUser = {
-            email: requestBody.email,
-            password: requestBody.password
-        }
-        var usersForHash = [frontEndUser, userInDb];
-        compareHash(usersForHash)
-        .then(userDB => createHash(user))
-        .catch(err => callback(err, undefined))
-    })
-}*/
+// module.exports.changePassword = function(requestBody, callback){
+//     var oldPassword = requestBody.actualPassword;
+//     var oldPasswordRepeat = requestBody.actualPasswordRepeat;
+//     if(oldPassword != oldPasswordRepeat){
+//         //TODO: Throw error
+//     }
+//     User.findOne({
+//         email: requestBody.email
+//     }, function(err, userInDb){
+//         if(err) {
+//             var errorInfo = {
+//                 status : 500,
+//                 errorCode : errorCodes.INTERNAL_ERROR,
+//                 errorKey : "ERRORS.INTERNAL_ERROR"
+//             }
+//             var error = new CustomError(errorInfo);
+//             return callback(error, undefined);
+//         }
+//         var frontEndUser = {
+//             email: requestBody.email,
+//             password: requestBody.password
+//         }
+//         var usersForHash = [frontEndUser, userInDb];
+//         compareHash(usersForHash)
+//         .then(userDB => function(){
+//             var newPassword = {
+//                 email: frontEndUser.email,
+//                 password: frontEndUser.newPassword
+//             }
+//             createHash(newPassword)
+//         })
+//         .catch(err => callback(err, undefined))
+//     })
+// }
 
 module.exports.deleteUser = function(userId, callback){
     var resUser;

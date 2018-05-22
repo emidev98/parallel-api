@@ -25,6 +25,25 @@ module.exports = function(app){
     * USERS ROUTES ****
     ******************/
 
+    app.put('/google-sign-in', function(req, res) {
+        User.googleSignIn(req.body, function(err, user){
+            if(err){
+                var errorStatus = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(errorStatus);
+            }
+            var tokenmail = user.token+"|"+user.email;
+            var authorization = Buffer.from(tokenmail).toString('base64');
+            var responseObject = {
+                id : user._id,
+                token : authorization,
+            }
+            res.status(200).send(responseObject);
+        })
+    })
+
     app.put('/register', function(req, res){
         User.register(req.body, function(err, user){
             if(err){
