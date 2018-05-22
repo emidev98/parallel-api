@@ -4,7 +4,7 @@ var Account = require('../models/Account');
 var Session = require('../models/Session');
 var CryptoUser = require('../models/CryptoUser');
 
-var user = new User(
+/*var user = new User(
     {
         publicKey: 2,
         image: "",
@@ -20,17 +20,17 @@ user.save(function (err, user) {
     if (err) return console.error(err);
     console.log("guardat");
 });
-
-var millisecondsToWait = 1000;
-setTimeout(function() {
+*/
+//var millisecondsToWait = 1000;
+//setTimeout(function() {
     User.findOne({email: "test@test.test"},function (err, user2) {
       if (err) return console.error(err);
       var accountGroup = new AccountGroup (
           {
-              userGroupId: 1,
-              userId: user2._id,
-              image: "",
-              name: "accountGroupTest",
+              index: 1,
+              userId: ObjectId("5b04360c4e018a125247a88a"),
+              image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+              name: "Default",
           }
       );
       accountGroup.save(function (err, accountGroup) {
@@ -39,13 +39,14 @@ setTimeout(function() {
       });
       var account = new Account(
           {
-              userGroupId: 1,
-              userId: user2._id,
+              groupId: 1,
+              userId: ObjectId("5b04360c4e018a125247a88a"),
               title: "Facebook",
-              image: "test",
+              image: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
               description: "descriptiontest",
               user: "facebookUser",
-              password: "ThisIsMyPassword"
+              password: "ThisIsMyPassword",
+              index: 1
           }
       );
       account.save(function (err, account) {
@@ -54,13 +55,14 @@ setTimeout(function() {
       });
       var account2 = new Account(
           {
-              userGroupId: 1,
-              userId: user2._id,
-              title: "Facebook",
-              image: "test",
+              groupId: 1,
+              userId: ObjectId("5b04360c4e018a125247a88a"),
+              title: "Twitter",
+              image: "http://kb4images.com/images/image/37185176-image.jpg",
               description: "descriptiontest",
-              user: "facebookUser",
-              password: "ThisIsMyPassword"
+              user: "facebookUser3",
+              password: "ThisIsMyPassword3",
+              index: 2
           }
       );
       account2.save(function (err, account2) {
@@ -70,8 +72,8 @@ setTimeout(function() {
       var accountGroup2 = new AccountGroup(
           {
               userGroupId: 2,
-              userId: user2._id,
-              image: "",
+              userId: ObjectId("5b04360c4e018a125247a88a"),
+              image: "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg",
               name: "accountGroupTest",
           }
       );
@@ -81,37 +83,38 @@ setTimeout(function() {
       });
       var account3 = new Account(
           {
-              userGroupId: 2,
-              userId: user2._id,
+              groupId: 2,
+              userId: ObjectId("5b04360c4e018a125247a88a"),
               title: "Facebook",
-              image: "test",
+              image: "https://www.codeproject.com/KB/GDI-plus/ImageProcessing2/img.jpg",
               description: "descriptiontest",
               user: "facebookUser",
-              password: "ThisIsMyPassword"
+              password: "ThisIsMyPassword",
+              index: 1
           }
       );
       account3.save(function (err, account3) {
           if (err) return console.error(err);
             console.log("guardat account3");
       });
-      var session = new Session({
-          userId: user2._id,
-          ip: "192.168.1.1",
-          location: "Somewhere",
-          browser: "shitfox",
-          os: "win",
-      });
-      session.save(function (err, session) {
-          if (err) return console.error(err);
-            console.log("guardat session");
-      });
-      var cryptoUser = new CryptoUser({
-          userid: user2._id,
-          privatekey: "thisisnotprivatekey"
-      });
-      cryptoUser.save(function (err, cryptoUser) {
-          if (err) return console.error(err);
-            console.log("guardat crypto");
-      });
+      // var session = new Session({
+      //     userId: user2._id,
+      //     ip: "192.168.1.1",
+      //     location: "Somewhere",
+      //     browser: "shitfox",
+      //     os: "win",
+      // });
+      // session.save(function (err, session) {
+      //     if (err) return console.error(err);
+      //       console.log("guardat session");
+      // });
+      // var cryptoUser = new CryptoUser({
+      //     userid: user2._id,
+      //     privatekey: "thisisnotprivatekey"
+      // });
+      // cryptoUser.save(function (err, cryptoUser) {
+      //     if (err) return console.error(err);
+      //       console.log("guardat crypto");
+      // });
     });
-}, millisecondsToWait);
+//}, millisecondsToWait);
