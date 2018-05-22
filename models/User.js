@@ -15,9 +15,9 @@ var UsersSchema = new Schema({
     language: {type: String, default: "ES"},
     googleId: String,
     styles: {
-        backgroundImage: String,
-        isGridView: Boolean,
-        image: String
+        backgroundImage: {type: String, default: ""},
+        isGridView: {type: Boolean, default: true},
+        image: {type: String, default: ""}
     }
 }, { collection : 'users' });
 
