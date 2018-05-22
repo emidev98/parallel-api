@@ -14,7 +14,7 @@ var UsersSchema = new Schema({
     password: String,
     language: {type: String, default: "ES"},
     googleId: String,
-    style: {
+    styles: {
         backgroundImage: String,
         isGridView: Boolean,
         image: String

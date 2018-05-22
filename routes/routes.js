@@ -76,8 +76,10 @@ module.exports = function(app){
             var tokenmail = userDB.token+"|"+userDB.email;
             var authorization = Buffer.from(tokenmail).toString('base64');
             var returnUser = {
-                id : userDB._id,
-                token: authorization,
+                data: {
+                    id : userDB._id,
+                    token: authorization,
+                }
             }
             res.status(200).send(returnUser);
         });
@@ -93,16 +95,18 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var returnUser = {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                age: user.age,
-                email: user.email,
-                password: user.password,
-                language: user.language,
-                style: {
-                    backgroundImage: user.style.backgroundImage,
-                    isGridView: user.style.isGridView,
-                    image: user.style.image
+                data: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    age: user.age,
+                    email: user.email,
+                    password: user.password,
+                    language: user.language,
+                    styles: {
+                        backgroundImage: user.styles.backgroundImage,
+                        isGridView: user.styles.isGridView,
+                        image: user.styles.image
+                    }
                 }
             }
             res.status(200).send(returnUser);
@@ -130,10 +134,10 @@ module.exports = function(app){
                     email: user.email,
                     password: user.password,
                     language: user.language,
-                    style: {
-                        backgroundImage: user.style.backgroundImage,
-                        isGridView: user.style.isGridView,
-                        image: user.style.image
+                    styles: {
+                        backgroundImage: user.styles.backgroundImage,
+                        isGridView: user.styles.isGridView,
+                        image: user.styles.image
                     }
                 }
             }

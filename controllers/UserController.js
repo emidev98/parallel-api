@@ -43,7 +43,7 @@ module.exports.googleSignIn = function(user, callback){
         if(!dbUser){
             console.log(user);
             user.googleId = user.id;
-            user.style = {
+            user.styles = {
                 image : user.image
             }
             createKeyPair(user)
@@ -123,11 +123,11 @@ module.exports.modifyUser = function(userId, user, callback){
             userDb.email = user.email;
         if (user.languages)
             userDb.language = user.language;
-        if (user.style){
-            if (user.style.backgroundImage)
-                userDb.style.backgroundImage = user.style.backgroundImage;
-            if (user.style.isGridView)
-                userDb.style.isGridView = user.style.isGridView;
+        if (user.styles){
+            if (user.styles.backgroundImage)
+                userDb.styles.backgroundImage = user.styles.backgroundImage;
+            if (user.styles.isGridView)
+                userDb.styles.isGridView = user.styles.isGridView;
         }
 
         userDb.save(function(err, userSaved){
@@ -251,6 +251,11 @@ function saveNewUser(user, privkey){
 			if(err){
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
+            user.styles = {
+                backgroundImage : "",
+                isGridView : true,
+                image : "",
+            };
             var defaultAccountGroup = new AccountGroup({
                 index: -1,
                 userId: savedUser._id,
