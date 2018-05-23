@@ -3,3 +3,4 @@ package-lock.json
 .ftpconfig
 key.pem
 public.pem
+sendgrid.env
