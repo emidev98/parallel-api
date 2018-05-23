@@ -86,7 +86,7 @@ module.exports.getAccountInfo = function(userEmail, accountId, callback){
                 return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
             }
             CryptoUser.getPrivateKey(user._id)
-            .then(plaintext => decryptPassoword(plaintext, account))
+            .then(plaintext => this.decryptPassoword(plaintext, account))
             .then(accountWithPassword => callback(null, accountWithPassword))
             .catch(err => callback(err, undefined))
         })
@@ -110,7 +110,7 @@ module.exports.deleteAccount = function(accountId, callback){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             CryptoUser.getPrivateKey(resAccount.userId).then((privkey) => {
-                decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
+                this.decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
             });
         })
     })
@@ -182,7 +182,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
 }
 
 
-function decryptPassoword(privkey, account){
+module.exports.decryptPassoword = function(privkey, account){
     console.log(privkey);
     console.log(account);
     return new Promise(function(resolve, reject) {

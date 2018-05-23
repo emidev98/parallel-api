@@ -48,8 +48,8 @@ module.exports.googleSignIn = function(user, callback){
             user.styles = {
                 image : user.image
             }
-            createKeyPair(user)
-            .then(resolveReturn => saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+            this.createKeyPair(user)
+            .then(resolveReturn => this.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
             .then(savedUser => callback(null, savedUser))
             .catch(err => callback(err, undefined))
         } else {
@@ -74,17 +74,17 @@ module.exports.register = function(user, callback){
     if(user.password.toString() != user.repeatPassword.toString()){
         return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
     }
-    checkNewUserEmail(user)
-    .then(user => createHash(user))
-    .then(user => createKeyPair(user))
- 	.then(resolveReturn => saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+    this.checkNewUserEmail(user)
+    .then(user => this.createHash(user))
+    .then(user => this.createKeyPair(user))
+ 	.then(resolveReturn => this.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
     .then(savedUser => callback(null, savedUser))
     .catch(err => callback(err, undefined))
 }
 
 module.exports.login = function (user, callback){
-	checkUserEmail(user)
-		.then(users => compareHash(users))
+	this.checkUserEmail(user)
+		.then(users => this.compareHash(users))
 		.then(userDB => callback(null, userDB))
 		.catch(err => callback(err, undefined))
 }
@@ -167,9 +167,9 @@ module.exports.changePassword = function(requestBody, userId, callback){
             password: requestBody.newPassword
         }
         var usersForHash = [oldPasswordUser, userInDb];
-        compareHash(usersForHash)
-        .then(userDB => createHash(newPasswordUser))
-        .then(user => saveNewPassword(userInDb, user.password))
+        this.compareHash(usersForHash)
+        .then(userDB => this.createHash(newPasswordUser))
+        .then(user => this.saveNewPassword(userInDb, user.password))
         .then(userSaved => callback(null, userSaved))
         .catch(err => callback(err, undefined))
     })
@@ -196,7 +196,14 @@ module.exports.deleteUser = function(userId, callback){
     })
 }
 
-function checkNewUserEmail(user){
+
+
+
+    /**********************
+    *PROMISES FUNCTIONS****
+    **********************/
+
+module.exports.checkNewUserEmail = function(user){
 	return new Promise(function(resolve, reject) {
 		User.find({
 			email: user.email
@@ -212,7 +219,7 @@ function checkNewUserEmail(user){
 	})
 }
 
-function createHash(user){
+module.exports.createHash = function(user){
     console.log("Im creating hash");
 	return new Promise(function(resolve, reject) {
 		var plainHash = user.password + user.email.split("@", 1)[0];
@@ -227,7 +234,7 @@ function createHash(user){
 	});
 }
 
-function createKeyPair(user){
+module.exports.createKeyPair = function(user){
 	return new Promise(function(resolve, reject) {
 		var keyOption = {
 			userIds: [{name: user.firstName, email: user.email}],
@@ -245,7 +252,7 @@ function createKeyPair(user){
 	});
 }
 
-function saveNewUser(user, privkey){
+module.exports.saveNewUser = function(user, privkey){
 	return new Promise(function(resolve, reject) {
         user.token = randtoken.generate(16);
         user.styles = {
@@ -282,7 +289,7 @@ function saveNewUser(user, privkey){
 	});
 }
 
-function checkUserEmail(user){
+module.exports.checkUserEmail = function(user){
 	return new Promise(function (resolve, reject){
 		User.findOne({
 			email: user.email
@@ -299,7 +306,7 @@ function checkUserEmail(user){
 	})
 }
 
-function compareHash(users){
+module.exports.compareHash = function(users){
     console.log(users)
     console.log("Im comparing hash");
 	var USER_FRONT_END = 0;
@@ -318,7 +325,7 @@ function compareHash(users){
     })
 }
 
-function saveNewPassword(userInDb, newPassword) {
+module.exports.saveNewPassword = function(userInDb, newPassword) {
     console.log("Im saving user hash");
     return new Promise(function(resolve, reject){
         userInDb.password = newPassword;

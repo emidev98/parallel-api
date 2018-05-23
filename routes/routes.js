@@ -103,7 +103,6 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(error);
             }
-            console.log(user);
             var returnUser = {
                 data: {
                     firstName: user.firstName,
