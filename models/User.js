@@ -33,7 +33,7 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
     				return callback(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
                 if (!doc){
-                    callback(1);
+                    return callback(1);
                 }
                 max = doc.index;
                 callback(max);
