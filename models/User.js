@@ -14,6 +14,7 @@ var UsersSchema = new Schema({
     password: String,
     language: {type: String, default: "ES"},
     googleId: String,
+    emailConfirmed: {type: Boolean, default: true},
     styles: {
         backgroundImage: {type: String, default: ""},
         isGridView: {type: Boolean, default: true},
@@ -30,6 +31,9 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
             {
                 if (err){
     				return callback(new CustomError(errorCodes.INTERNAL_ERROR));
+                }
+                if (!doc){
+                    callback(1);
                 }
                 max = doc.index;
                 callback(max);
