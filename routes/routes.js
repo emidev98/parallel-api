@@ -259,7 +259,15 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var responseReturn = {
-                data : account
+                data : {
+                    id: account.id,
+                    groupId: account.groupId,
+                    title: account.title,
+                    image: account.image,
+                    description: account.description,
+                    user: account.user,
+                    password: account.password
+                }
             }
             res.status(200).send(responseReturn);
         })
@@ -472,8 +480,17 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(error);
             }
+            var returnGroups = [];
+            for (var i = 0; i < groups.length; i++){
+                returnGroups[i] = {
+                    id: groups[i]._id,
+                    index: groups[i].index,
+                    name: groups[i].name,
+                    image: groups[i].image
+                }
+            }
             var returnGroups = {
-                data: groups
+                data: returnGroups
             }
             res.status(200).send(returnGroups);
         })
