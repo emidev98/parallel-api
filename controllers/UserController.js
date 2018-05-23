@@ -11,6 +11,7 @@ var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
+var UserController          = require('./UserController')
 
 
 
@@ -48,8 +49,8 @@ module.exports.googleSignIn = function(user, callback){
             user.styles = {
                 image : user.image
             }
-            this.createKeyPair(user)
-            .then(resolveReturn => this.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+            UserController.createKeyPair(user)
+            .then(resolveReturn => UserController.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
             .then(savedUser => callback(null, savedUser))
             .catch(err => callback(err, undefined))
         } else {
@@ -167,9 +168,9 @@ module.exports.changePassword = function(requestBody, userId, callback){
             password: requestBody.newPassword
         }
         var usersForHash = [oldPasswordUser, userInDb];
-        this.compareHash(usersForHash)
-        .then(userDB => this.createHash(newPasswordUser))
-        .then(user => this.saveNewPassword(userInDb, user.password))
+        UserController.compareHash(usersForHash)
+        .then(userDB => UserController.createHash(newPasswordUser))
+        .then(user => UserController.saveNewPassword(userInDb, user.password))
         .then(userSaved => callback(null, userSaved))
         .catch(err => callback(err, undefined))
     })

@@ -5,6 +5,7 @@ var Account      = require('../models/Account');
 var errorCodes   = require('../responses/errorCodes');
 var CustomError  = require('../responses/CustomError');
 var CryptoUser   = require('./CryptoUserController');
+var AccountController = require('./AccountController')
 
 module.exports.createAccount = function(userEmail, account, callback){
     User.findOne({
@@ -16,31 +17,23 @@ module.exports.createAccount = function(userEmail, account, callback){
         if (!user){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        var publicKey = user.publicKey;
-        var options = {
-            data: account.password,                             // input as String (or Uint8Array)
-            publicKeys: openpgp.key.readArmored(publicKey).keys,  // for encryption
-        };
-
-        openpgp.encrypt(options).then(function(ciphertext) {
-            var newAccount = new Account({
-                userId: user._id,
-                groupId: account.groupId,
-                name: account.name,
-                image: account.image,
-                description: account.description,
-                user: account.user,
-                password: ciphertext.data,
-                index: account.index
-            });
-            newAccount.save(function(err, savedAccount){
-                if (err){
-                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                }
-                savedAccount.password = account.password;
-                callback(null, savedAccount);
-            })
+        var newAccount = new Account({
+            userId: user._id,
+            groupId: account.groupId,
+            name: account.name,
+            image: account.image,
+            description: account.description,
+            user: account.user,
+            password: account.password,
+            index: account.index
         });
+        var userAccount = {
+            userObj: user,
+            accountObj: newAccount
+        };
+        AccountController.encryptAndSave(userAccount)
+        .then(savedAccount => callback(null, savedAccount))
+        .catch(err => callback(err, undefined))
     })
 }
 
@@ -86,7 +79,7 @@ module.exports.getAccountInfo = function(userEmail, accountId, callback){
                 return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
             }
             CryptoUser.getPrivateKey(user._id)
-            .then(plaintext => this.decryptPassoword(plaintext, account))
+            .then(plaintext => AccountController.decryptPassoword(plaintext, account))
             .then(accountWithPassword => callback(null, accountWithPassword))
             .catch(err => callback(err, undefined))
         })
@@ -110,7 +103,7 @@ module.exports.deleteAccount = function(accountId, callback){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             CryptoUser.getPrivateKey(resAccount.userId).then((privkey) => {
-                this.decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
+                AccountController.decryptPassoword(privkey, resAccount).then((sendAccount) => callback(null, sendAccount))
             });
         })
     })
@@ -135,52 +128,19 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
             if (!account){
                 return callback(new CustomError(errorCodes.ACCOUNT_NOT_FOUND), undefined);
             }
-            if (account.groupId)
-                accountDb.groupId = account.groupId;
-
-            if (account.name)
-                accountDb.name = account.name;
-
-            if (account.image)
-                accountDb.image = account.image;
-
-            if (account.description)
-                accountDb.description = account.description;
-
-            if (account.user)
-                accountDb.user = account.user;
-
-            if (account.password){
-                var publicKey = user.publicKey;
-                var options = {
-                    data: account.password,                             // input as String (or Uint8Array)
-                    publicKeys: openpgp.key.readArmored(publicKey).keys,  // for encryption
-                };
-
-                openpgp.encrypt(options).then(function(ciphertext) {
-                    accountDb.password = ciphertext.data;
-                    accountDb.save(function(err, savedAccount){
-                        if (err){
-                            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                        }
-                        savedAccount.password = account.password;
-                        callback(null, savedAccount);
-                    })
-                })
-            } else {
-                accountDb.save(function(err, savedAccount){
-                    if (err){
-                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                    }
-                    savedAccount.password = account.password;
-                    callback(null, savedAccount);
-                })
-            }
-
+            var accounts = [account, accountDb, user];
+            AccountController.checkAccountModifications(accounts)
+            .then(savedAccount => callback(null, savedAccount))
+            .catch(err => callback(err, undefined))
         })
     })
 }
 
+
+
+    /**********************
+    *PROMISES FUNCTIONS****
+    **********************/
 
 module.exports.decryptPassoword = function(privkey, account){
     console.log(privkey);
@@ -199,4 +159,76 @@ module.exports.decryptPassoword = function(privkey, account){
             return reject(err);
         });
     });
+}
+
+module.exports.encryptAndSave = function(userAccount){
+    return new Promise(function(resolve, reject){
+        console.log("encrypting");
+        var user = userAccount.userObj;
+        var account = userAccount.accountObj;
+        var publicKey = user.publicKey;
+        var textPwd = account.password;
+        var options = {
+            data: account.password,                             // input as String (or Uint8Array)
+            publicKeys: openpgp.key.readArmored(publicKey).keys,  // for encryption
+        };
+
+        openpgp.encrypt(options).then(function(ciphertext) {
+            account.password = ciphertext.data
+            account.save(function(err, savedAccount){
+                if (err){
+                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+                }
+                console.log("saved");
+                savedAccount.password = textPwd;
+                resolve(savedAccount);
+            })
+        });
+    })
+}
+
+module.exports.checkAccountModifications = function(userAccounts){
+    var ACCOUNT_FRONT_END = 0;
+    var ACCOUNT_DB = 1;
+    var USER = 2;
+    var user = userAccounts[USER];
+    return new Promise(function(resolve, reject){
+        console.log("checking");
+        if (userAccounts[ACCOUNT_FRONT_END].groupId)
+            userAccounts[ACCOUNT_DB].groupId = userAccounts[ACCOUNT_FRONT_END].groupId;
+
+        if (userAccounts[ACCOUNT_FRONT_END].name)
+            userAccountDb[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
+
+        if (userAccounts[ACCOUNT_FRONT_END].image)
+            userAccounts[ACCOUNT_DB].image = userAccounts[ACCOUNT_FRONT_END].image;
+
+        if (userAccounts[ACCOUNT_FRONT_END].description)
+            userAccounts[ACCOUNT_DB].description = userAccounts[ACCOUNT_FRONT_END].description;
+
+        if (userAccounts[ACCOUNT_FRONT_END].user)
+            userAccounts[ACCOUNT_DB].user = userAccounts[ACCOUNT_FRONT_END].user;
+
+        if (userAccounts[ACCOUNT_FRONT_END].password){
+            userAccounts[ACCOUNT_DB].password = userAccounts[ACCOUNT_FRONT_END].password;
+            var userAccount = {
+                userObj: user,
+                accountObj: userAccounts[ACCOUNT_DB]
+            }
+            AccountController.encryptAndSave(userAccount)
+            .then(savedAccount => resolve(savedAccount))
+            .catch(err => reject(err))
+
+        } else {
+            userAccounts[ACCOUNT_DB].save(function(err, savedAccount){
+                if (err){
+                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+                }
+                CryptoUser.getPrivateKey(user._id)
+                .then(plaintext => AccountController.decryptPassoword(plaintext, savedAccount))
+                .then(accountWithPassword => resolve(accountWithPassword))
+                .catch(err => reject(err))
+            })
+        }
+    })
 }
