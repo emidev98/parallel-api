@@ -12,7 +12,9 @@ var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
 var UserController          = require('./UserController')
-
+const {OAuth2Client}        = require('google-auth-library');
+const client                = new OAuth2Client(CLIENT_ID);
+const CLIENT_ID             = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
@@ -34,39 +36,55 @@ module.exports.isLogged = function(tokenString, emailString, callback){
     })
 }
 
+module.exports.verifyGoogleAccount = function(token){
+    return new Promise(function(resolve, reject){
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const userid = payload['sub'];
+        console.log(userid);
+        resolve(userid);
+    })
+}
+
 module.exports.googleSignIn = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
-    User.findOne({
-        email: user.email
-    }, function(err, dbUser) {
-        if(err){
-            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-        }
-        if(!dbUser){
-            console.log(user);
-            user.googleId = user.id;
-            user.styles = {
-                image : user.image
+    verify(user.id).then(userid => function(userid){
+        console.log(userid);
+        User.findOne({
+            email: user.email
+        }, function(err, dbUser) {
+            if(err){
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
-            UserController.createKeyPair(user)
-            .then(resolveReturn => UserController.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
-            .then(savedUser => callback(null, savedUser))
-            .catch(err => callback(err, undefined))
-        } else {
-            User.findOne({
-                _id : user.id
-            }, function(err, idValidatedUser){
-                if(err){
-                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+            if(!dbUser){
+                console.log(user);
+                user.googleId = user.id;
+                user.styles = {
+                    image : user.image
                 }
-                if(!idValidatedUser){
-    				return callback(new CustomError(errorCodes.DUPLICATED_USER), undefined);
-                }
-                callback(null, dbUser);
-            })
-        }
-    })
+                UserController.createKeyPair(user)
+                .then(resolveReturn => UserController.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+                .then(savedUser => callback(null, savedUser))
+                .catch(err => callback(err, undefined))
+            } else {
+                User.findOne({
+                    _id : user.id
+                }, function(err, idValidatedUser){
+                    if(err){
+                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                    }
+                    if(!idValidatedUser){
+        				return callback(new CustomError(errorCodes.DUPLICATED_USER), undefined);
+                    }
+                    callback(null, dbUser);
+                })
+            }
+        })
+    }).catch(console.error);
 }
 
 module.exports.register = function(user, callback){
