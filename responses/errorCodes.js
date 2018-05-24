@@ -8,4 +8,5 @@ module.exports = {
     ACCOUNT_NOT_FOUND: 600,
     GROUP_NOT_FOUND: 700,
     EMAIL_NOT_CONFIRMED: 800,
+    INCORRECT_REQUEST: 900,
 }

@@ -47,6 +47,11 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.EMAIL_NOT_CONFIRMED;
             this.errorKey = "ERRORS.EMAIL_NOT_CONFIRMED";
             break;
+        case errorCodes.INCORRECT_REQUEST:
+            this.status = 404;
+            this.errorCode = errorCodes.INCORRECT_REQUEST;
+            this.errorKey = "ERRORS.INCORRECT_REQUEST";
+            break;
   }
 };
 
