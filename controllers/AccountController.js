@@ -232,3 +232,27 @@ module.exports.checkAccountModifications = function(userAccounts){
         }
     })
 }
+
+module.exports.deleteAccountsOnGroup = function(group){
+    return new Promise(function(resolve, reject){
+        Account.find({
+            userId: group.userId,
+            groupId: group.index
+        }, function(err, accounts){
+            if (err){
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+            }
+            if (!accounts){
+                return resolve(group);
+            }
+            accounts.forEach(account => {
+                account.remove(function(err){
+                    if (err){
+                        return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+                    }
+                })
+            })
+            resolve(group);
+        })
+    })
+}

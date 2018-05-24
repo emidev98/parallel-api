@@ -1,9 +1,10 @@
-var express 	 = require('express');
-var openpgp      = require('openpgp');
-var User 		 = require('../models/User');
-var AccountGroup = require('../models/AccountGroup');
-var errorCodes   = require('../responses/errorCodes');
-var CustomError  = require('../responses/CustomError');
+var express 	      = require('express');
+var openpgp           = require('openpgp');
+var User 		      = require('../models/User');
+var AccountGroup      = require('../models/AccountGroup');
+var errorCodes        = require('../responses/errorCodes');
+var CustomError       = require('../responses/CustomError');
+var AccountController = require('../controllers/AccountController');
 
 module.exports.createGroup = function(userEmail, group, callback){
     User.findOne({
@@ -66,11 +67,14 @@ module.exports.deleteGroup = function(groupId, callback){
             return callback(new CustomError(errorCodes.GROUP_NOT_FOUND), undefined);
         }
         resGroup = group;
-        group.remove(function(err){
-            if (err){
-                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-            }
-            return callback(null, resGroup);
+        AccountController.deleteAccountsOnGroup(group)
+        .then(group => {
+            group.remove(function(err){
+                if (err){
+                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                }
+                return callback(null, resGroup);
+            })
         })
     })
 }
