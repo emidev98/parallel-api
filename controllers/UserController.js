@@ -198,7 +198,29 @@ module.exports.deleteUser = function(userId, callback){
     })
 }
 
-
+module.exports.confirmEmail = function(userId, callback){
+    if (userId.length != 24){
+        return callback(new CustomError(errorCodes.INCORRECT_REQUEST), undefined);
+    }
+    User.findOne({
+        _id: userId
+    }, function(err, user){
+        if (err){
+            console.log(err);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
+        user.emailConfirmed = true;
+        user.save(function(err, userSaved){
+            if (err){
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+            }
+            callback(null, userSaved);
+        })
+    })
+}
 
 
     /**********************

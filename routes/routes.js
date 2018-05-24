@@ -60,8 +60,7 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(errorStatus);
             }
-            var tokenmail = user.token+"|"+user.email;
-            var authorization = Buffer.from(tokenmail).toString('base64');
+
             var confirmError = new CustomError(errorCodes.EMAIL_NOT_CONFIRMED);
             var errorStatus = {
                 errorCode: confirmError.errorCode,
@@ -205,6 +204,31 @@ module.exports = function(app){
                     password : user.password,
                     language : user.language,
                     styles: user.styles
+                }
+            }
+            res.status(200).send(returnUser);
+        })
+    })
+
+    app.post('/confirm-account/:id', function(req, res){
+        User.confirmEmail(req.params.id, function(err, user){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var tokenmail = user.token+"|"+user.email;
+            var authorization = Buffer.from(tokenmail).toString('base64');
+            var returnUser = {
+                success: {
+                    successCode: successCodes.EMAIL_SUCCESSFULLY_CONFIRMED,
+                    successKey: "SUCCESS.EMAIL_SUCCESSFULLY_CONFIRMED"
+                },
+                data: {
+                    id: user._id,
+                    token: authorization
                 }
             }
             res.status(200).send(returnUser);
