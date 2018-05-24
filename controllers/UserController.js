@@ -11,8 +11,8 @@ var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
-var UserController          = require('./UserController')
-
+var UserController          = require('./UserController');
+var sgMail                = require('@sendgrid/mail');
 
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
@@ -79,6 +79,7 @@ module.exports.register = function(user, callback){
     .then(user => this.createHash(user))
     .then(user => this.createKeyPair(user))
  	.then(resolveReturn => this.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+    .then(savedUser => this.sendMail(savedUser))
     .then(savedUser => callback(null, savedUser))
     .catch(err => callback(err, undefined))
 }
@@ -265,29 +266,34 @@ module.exports.saveNewUser = function(user, privkey){
 			if(err){
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
-            var defaultAccountGroup = new AccountGroup({
-                index: -1,
+            var newCryptoUser = {
                 userId: savedUser._id,
-                image: "",
-                name: "Accounts"
+                privateKey: privkey,
+            }
+            CryptoUserController.saveCryptoUser(newCryptoUser)
+            .then(function(cryptoUser){
+                return resolve(savedUser);
+            }).catch(function(error){
+                return reject(error);
             });
-            defaultAccountGroup.save(function(err, accountGroup){
-                if (err){
-                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
-                }
-                var newCryptoUser = {
-    				userId: savedUser._id,
-    				privateKey: privkey,
-    			}
-                CryptoUserController.saveCryptoUser(newCryptoUser)
-                .then(function(cryptoUser){
-                    return resolve(savedUser);
-                }).catch(function(error){
-                    return reject(error);
-                });
-            });
+
 		});
 	});
+}
+
+module.exports.sendMail = function(user){
+    return new Promise(function(resolve, reject){
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const msg = {
+          to: user.email,
+          from: 'no-reply@paralel.cf',
+          subject: 'Email de confirmación',
+          text: 'Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '. Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón.',
+          html: '<div style="font-size: 16px;">Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '.<br>Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón. <br><br><a href="https://www.google.com/" style="display: grid; padding: 1em; background-color: #3f51b5; margin-top: 0.5em; color: white; text-decoration: none; align-items: center; width: 125px; text-align: center;">Confirmar Email</a></div>',
+        };
+        sgMail.send(msg);
+        resolve(user);
+    })
 }
 
 module.exports.checkUserEmail = function(user){
