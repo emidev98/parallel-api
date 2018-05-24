@@ -9,6 +9,8 @@ module.exports = function(app){
     var AccountGroup = require('../controllers/GroupsController');
     var Account      = require('../controllers/AccountController');
     var helloWorld   = require('../controllers/HelloWorldController');
+    var errorCodes   = require('../responses/errorCodes');
+    var CustomError  = require('../responses/CustomError');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -51,6 +53,7 @@ module.exports = function(app){
         User.register(req.body, function(err, user){
             if(err){
                 console.log("2");
+                console.log(err);
                 var errorStatus = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -59,14 +62,12 @@ module.exports = function(app){
             }
             var tokenmail = user.token+"|"+user.email;
             var authorization = Buffer.from(tokenmail).toString('base64');
-            var responseObject = {
-                data: {
-                    id : user._id,
-                    token : authorization,
-                }
+            var confirmError = new CustomError(errorCodes.EMAIL_NOT_CONFIRMED);
+            var errorStatus = {
+                errorCode: confirmError.errorCode,
+                errorKey: confirmError.errorKey
             }
-
-            res.status(200).send(responseObject);
+            return res.status(confirmError.status).send(errorStatus);
         });
     });
 

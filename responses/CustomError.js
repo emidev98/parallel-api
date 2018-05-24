@@ -42,7 +42,7 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.GROUP_NOT_FOUND;
             this.errorKey = "ERRORS.GROUP_NOT_FOUND";
             break;
-        case errorCode.EMAIL_NOT_CONFIRMED:
+        case errorCodes.EMAIL_NOT_CONFIRMED:
             this.status = 403;
             this.errorCode = errorCodes.EMAIL_NOT_CONFIRMED;
             this.errorKey = "ERRORS.EMAIL_NOT_CONFIRMED";
