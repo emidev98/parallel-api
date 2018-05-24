@@ -212,6 +212,9 @@ module.exports.confirmEmail = function(userId, callback){
         if (!user){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
+        if (user.emailConfirmed){
+            return callback(new CustomError(errorCodes.EMAIL_ALLREADY_CONFIRMED), undefined);
+        }
         user.emailConfirmed = true;
         user.save(function(err, userSaved){
             if (err){

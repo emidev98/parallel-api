@@ -48,10 +48,16 @@ module.exports = function CustomError(code) {
             this.errorKey = "ERRORS.EMAIL_NOT_CONFIRMED";
             break;
         case errorCodes.INCORRECT_REQUEST:
-            this.status = 404;
+            this.status = 411;
             this.errorCode = errorCodes.INCORRECT_REQUEST;
             this.errorKey = "ERRORS.INCORRECT_REQUEST";
             break;
+        case errorCodes.EMAIL_ALLREADY_CONFIRMED:
+            this.status = 405;
+            this.errorCode = errorCodes.EMAIL_ALLREADY_CONFIRMED;
+            this.errorKey = "ERRORS.EMAIL_ALLREADY_CONFIRMED";
+            break;
+
   }
 };
 
