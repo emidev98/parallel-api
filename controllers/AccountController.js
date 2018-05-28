@@ -205,7 +205,7 @@ module.exports.checkAccountModifications = function(userAccounts){
             userAccounts[ACCOUNT_DB].groupId = userAccounts[ACCOUNT_FRONT_END].groupId;
 
         if (userAccounts[ACCOUNT_FRONT_END].name)
-            userAccountDb[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
+            userAccounts[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
 
         if (userAccounts[ACCOUNT_FRONT_END].image)
             userAccounts[ACCOUNT_DB].image = userAccounts[ACCOUNT_FRONT_END].image;
