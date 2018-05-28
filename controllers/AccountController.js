@@ -17,23 +17,28 @@ module.exports.createAccount = function(userEmail, account, callback){
         if (!user){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        var newAccount = new Account({
+        Account.find({
             userId: user._id,
-            groupId: account.groupId,
-            name: account.name,
-            image: account.image,
-            description: account.description,
-            user: account.user,
-            password: account.password,
-            index: account.index
-        });
-        var userAccount = {
-            userObj: user,
-            accountObj: newAccount
-        };
-        AccountController.encryptAndSave(userAccount)
-        .then(savedAccount => callback(null, savedAccount))
-        .catch(err => callback(err, undefined))
+            groupId: account.groupId
+        }).count().exec((res) => {
+            var newAccount = new Account({
+                userId: user._id,
+                groupId: account.groupId,
+                name: account.name,
+                image: account.image,
+                description: account.description,
+                user: account.user,
+                password: account.password,
+                index: res
+            });
+            var userAccount = {
+                userObj: user,
+                accountObj: newAccount
+            };
+            AccountController.encryptAndSave(userAccount)
+            .then(savedAccount => callback(null, savedAccount))
+            .catch(err => callback(err, undefined))
+        })
     })
 }
 
