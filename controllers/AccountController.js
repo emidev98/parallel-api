@@ -17,10 +17,10 @@ module.exports.createAccount = function(userEmail, account, callback){
         if (!user){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        Account.find({
+        Account.count({
             userId: user._id,
             groupId: account.groupId
-        }).count().exec((res) => {
+        }).exec((err, accountIndex) => {
             var newAccount = new Account({
                 userId: user._id,
                 groupId: account.groupId,
@@ -29,7 +29,7 @@ module.exports.createAccount = function(userEmail, account, callback){
                 description: account.description,
                 user: account.user,
                 password: account.password,
-                index: res
+                index: accountIndex
             });
             var userAccount = {
                 userObj: user,
