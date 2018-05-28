@@ -12,8 +12,8 @@ var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
 var UserController          = require('./UserController');
-var sgMail                = require('@sendgrid/mail');
-
+var sgMail                  = require('@sendgrid/mail');
+var GroupController         = require('../controllers/GroupsController')
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
 
@@ -115,8 +115,6 @@ module.exports.modifyUser = function(userId, user, callback){
         if (!userDb){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        if (user.image)
-            userDb.image = user.image;
         if (user.firstName)
             userDb.firstName = user.firstName;
         if (user.lastName)
@@ -128,6 +126,8 @@ module.exports.modifyUser = function(userId, user, callback){
         if (user.languages)
             userDb.language = user.language;
         if (user.styles){
+            if (user.styles.image)
+                userDb.styles.image = user.styles.image;
             if (user.styles.backgroundImage)
                 userDb.styles.backgroundImage = user.styles.backgroundImage;
             if (user.styles.isGridView)
@@ -189,11 +189,26 @@ module.exports.deleteUser = function(userId, callback){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         resUser = user;
-        user.remove(function(err){
-            if (err){
-                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        GroupController.findAll(resUser.email, function(err, groups){
+            if(err){
+                return callback(err, undefined);
             }
-            return callback(null, resUser);
+            var groupsProcessed = 0;
+            groups.foreach(group => {
+                GroupController.deleteGroup(group._id, function(err, resGroup){
+                    if(err){
+                        return callback(err, undefined);
+                    }
+                    if(groupsProcessed === groups.length){
+                        user.remove(function(err){
+                            if (err){
+                                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                            }
+                            return callback(null, resUser);
+                        })
+                    }
+                })
+            });
         })
     })
 }
