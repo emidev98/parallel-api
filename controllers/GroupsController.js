@@ -18,7 +18,7 @@ module.exports.createGroup = function(userEmail, group, callback){
         }
         var accountGroup = new AccountGroup();
         user.maxAccountGroupId(function(max){
-            accountGroup.index = max + 1;
+            accountGroup.index = max;
             accountGroup.userId = user._id;
             accountGroup.image = group.image;
             accountGroup.name = group.name;

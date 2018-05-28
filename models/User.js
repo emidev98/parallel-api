@@ -36,7 +36,7 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
                     return callback(1);
                 }
                 max = doc.index;
-                callback(max);
+                callback(max + 1);
             }
     );
 }
