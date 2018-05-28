@@ -86,6 +86,7 @@ module.exports.register = function(user, callback){
 
 module.exports.login = function (user, callback){
 	this.checkUserEmail(user)
+        .then(users => this.checkEmailConfirmed(users))
 		.then(users => this.compareHash(users))
 		.then(userDB => callback(null, userDB))
 		.catch(err => callback(err, undefined))
@@ -352,6 +353,17 @@ module.exports.checkUserEmail = function(user){
 			resolve(users);
 		})
 	})
+}
+
+module.exports.checkEmailConfirmed = function(users){
+    var USER_DB = 1;
+    var user = users[USER_DB];
+    return new Promise(function(resolve, reject){
+        if (!user.emailConfirmed){
+            return reject(new CustomError(errorCodes.EMAIL_NOT_CONFIRMED))
+        }
+        resolve(users)
+    })
 }
 
 module.exports.compareHash = function(users){

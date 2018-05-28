@@ -75,6 +75,7 @@ module.exports = function(app){
         User.login(req.body, function(err, userDB){
             if (err) {
                 console.log("3");
+                console.log(err);
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -287,11 +288,12 @@ module.exports = function(app){
                 data : {
                     id: account.id,
                     groupId: account.groupId,
-                    title: account.title,
+                    name: account.name,
                     image: account.image,
                     description: account.description,
                     user: account.user,
-                    password: account.password
+                    password: account.password,
+                    index: account.index
                 }
             }
             res.status(200).send(responseReturn);
