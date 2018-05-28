@@ -194,7 +194,7 @@ module.exports.deleteUser = function(userId, callback){
                 return callback(err, undefined);
             }
             var groupsProcessed = 0;
-            groups.foreach(group => {
+            groups.forEach(group => {
                 GroupController.deleteGroup(group._id, function(err, resGroup){
                     if(err){
                         return callback(err, undefined);
