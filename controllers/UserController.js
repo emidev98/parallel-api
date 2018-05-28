@@ -199,6 +199,7 @@ module.exports.deleteUser = function(userId, callback){
                     if(err){
                         return callback(err, undefined);
                     }
+                    groupsProcessed++;
                     if(groupsProcessed === groups.length){
                         user.remove(function(err){
                             if (err){
