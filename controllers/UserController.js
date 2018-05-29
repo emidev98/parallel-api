@@ -194,23 +194,32 @@ module.exports.deleteUser = function(userId, callback){
             if(err){
                 return callback(err, undefined);
             }
-            var groupsProcessed = 0;
-            groups.forEach(group => {
-                GroupController.deleteGroup(group._id, function(err, resGroup){
-                    if(err){
-                        return callback(err, undefined);
+            if(groups.length === 0){
+                user.remove(function(err){
+                    if (err){
+                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                     }
-                    groupsProcessed++;
-                    if(groupsProcessed === groups.length){
-                        user.remove(function(err){
-                            if (err){
-                                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                            }
-                            return callback(null, resUser);
-                        })
-                    }
+                    return callback(null, resUser);
                 })
-            });
+            } else {
+                var groupsProcessed = 0;
+                groups.forEach(group => {
+                    GroupController.deleteGroup(group._id, function(err, resGroup){
+                        if(err){
+                            return callback(err, undefined);
+                        }
+                        groupsProcessed++;
+                        if(groupsProcessed === groups.length){
+                            user.remove(function(err){
+                                if (err){
+                                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                                }
+                                return callback(null, resUser);
+                            })
+                        }
+                    })
+                });
+            }
         })
     })
 }
