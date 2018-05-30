@@ -570,9 +570,9 @@ module.exports = function(app){
                     id: groups[i]._id,
                     index: groups[i].index,
                     name: groups[i].name,
-                    imageUrl: group.image.imageUrl,
-                    imageDomain: group.image.imageDomain,
-                    imageName: group.image.imageName
+                    imageUrl: groups[i].image.imageUrl,
+                    imageDomain: groups[i].image.imageDomain,
+                    imageName: groups[i].image.imageName
                 }
             }
             var returnGroups = {
