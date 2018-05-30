@@ -12,9 +12,9 @@ var AccountsSchema = new Schema({
     password: String,
     index: Number,
     image: {
-        imageUrl: String,
-        imageDomain: String,
-        imageName: String,
+        imageUrl: {type: String, default: ""},
+        imageDomain: {type: String, default: ""},
+        imageName: {type: String, default: ""},
     },
 }, {collection: "accounts"});
 
