@@ -119,7 +119,6 @@ module.exports.modifyUser = function(userId, user, callback){
         userDb.firstName = user.firstName;
         userDb.lastName = user.lastName;
         userDb.age = user.age;
-        userDb.email = user.email;
         userDb.language = user.language;
         userDb.sendEmails = user.sendEmails;
         userDb.styles.image = user.styles.image;
