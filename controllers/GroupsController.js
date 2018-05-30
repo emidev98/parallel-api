@@ -17,6 +17,8 @@ module.exports.createGroup = function(userEmail, group, callback){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         var accountGroup = new AccountGroup();
+        var createdAccounts = [];
+        var accountsCreated = 0;
         user.maxAccountGroupId(function(max){
             accountGroup.index = max;
             accountGroup.userId = user._id;
@@ -26,7 +28,20 @@ module.exports.createGroup = function(userEmail, group, callback){
                 if (err){
                     return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                 }
-                callback(null, accountGroupSaved);
+                accountGroup.accounts.forEach(account => {
+                    account.groupId = group.index;
+                    AccountController.createAccount(userEmail, account, function(err, savedAccount){
+                        if (err){
+                            return callback(err, null)
+                        }
+                        accountsCreated++;
+                        createdAccounts.push(savedAccount);
+                        if (accountsCreated.length == accountGroup.accounts.length){
+                            accountGroupSaved.accounts = accountsCreated;
+                            return callback(null, accountGroupSaved);
+                        }
+                    })
+                })
             });
         });
     });
