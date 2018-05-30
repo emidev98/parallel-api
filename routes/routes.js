@@ -424,6 +424,7 @@ module.exports = function(app){
                     successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_MODIFIED"
                 },
                 data: {
+                    id: account.id,
                     groupId: account.groupId,
                     name : account.name,
                     description : account.description,
