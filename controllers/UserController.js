@@ -282,7 +282,7 @@ module.exports.sendMailResetPassword = function(userEmail, callback){
 }
 
 module.exports.resetPassword = function(user, callback){
-    var TIMEOUT = 20000;
+    var TIMEOUT = 50000;
     if (user.token.toString() == ""){
         return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
     }

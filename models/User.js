@@ -15,6 +15,9 @@ var UsersSchema = new Schema({
     language: {type: String, default: "ES"},
     googleId: String,
     emailConfirmed: {type: Boolean, default: false},
+    sendEmails: {type: Boolean, default: true},
+    recoveryToken: {type: String, default: ""},
+    recoveryDate: {type: Date, default: null},
     styles: {
         backgroundImage: {type: String, default: ""},
         isGridView: {type: Boolean, default: true},
