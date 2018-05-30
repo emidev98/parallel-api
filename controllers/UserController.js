@@ -242,6 +242,63 @@ module.exports.confirmEmail = function(userId, callback){
     })
 }
 
+module.exports.sendMailResetPassword = function(userEmail, callback){
+    User.findOne({
+        email: userEmail
+    }, function (err, user){
+        if (err){
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND))
+        }
+        user.recoveryToken = randtoken.generate(16);
+        user.recoveryDate = Date.now();
+        user.save(function(err, savedUser){
+            if (err){
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+            }
+            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            const msg = {
+              to: user.email,
+              from: 'no-reply@paralel.cf',
+              subject: 'Recuperar contraseña',
+              text: 'Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '. Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón.',
+              html: '<div style="font-size: 16px;">Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '.<br>Le informamos de que se ha solicitado un cambio de contraseña para este email, entre en el siguiente link e introduzca el codigo que le dejamos a continuacion: ' + savedUser.recoveryToken + '<br><br><a href="https://paralel.cf/reset-password/" style="display: grid; padding: 1em; background-color: #3f51b5; margin-top: 0.5em; color: white; text-decoration: none; align-items: center; width: 125px; text-align: center;">Cambiar contraseña</a></div>',
+            };
+            sgMail.send(msg);
+            callback(null);
+        })
+    })
+}
+
+module.exports.resetPassword = function(user, callback){
+    var TIMEOUT = 20000;
+    if (user.token.toString() == ""){
+        return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
+    }
+    if (user.password.toString() != user.repeatPassword.toString()){
+        return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
+    }
+    User.findOne({
+        recoveryToken: user.token
+    }, function(err, userDb){
+        if (err){
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+        }
+        if (!userDb){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND))
+        }
+        if (Date.now() - userDb.recoveryDate > TIMEOUT){
+            return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
+        }
+        UserController.createHash(userDb)
+        .then(user => UserController.removeToken(user))
+        .then(userHashed => UserController.saveNewPassword(userDb, userHashed.password))
+        .then(userSaved => callback(null, userSaved))
+        .catch(err => callback(err, undefined))
+    })
+}
 
     /**********************
     *PROMISES FUNCTIONS****
@@ -396,6 +453,19 @@ module.exports.saveNewPassword = function(userInDb, newPassword) {
             }
             console.log("This is new user saved changed password: "+userSaved);
             resolve(userSaved);
+        })
+    })
+}
+
+module.exports.removeToken = function(user){
+    return new Promise(function(resolve, reject){
+        user.recoveryDate = null;
+        user.recoveryToken = "";
+        user.save(function(err){
+            if (err){
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+            }
+            resolve(user)
         })
     })
 }

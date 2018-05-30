@@ -236,6 +236,44 @@ module.exports = function(app){
         })
     })
 
+    app.post('/send-reset-password-email', function(req, res){
+        User.sendMailResetPassword(req.body.email, function(err){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var success = {
+                success: {
+                    successCode: successCodes.MAIL_SUCCESSFULLY_SENDED,
+                    successKey: "SUCCESS.MAIL_SUCCESSFULLY_SENDED"
+                }
+            }
+            res.status(200).send(success);
+        })
+    })
+
+    app.post('/reset-password', function(req, res){
+        User.resetPassword(req.body, function(err){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var success = {
+                success: {
+                    successCode: successCodes.PASSWORD_SUCCESSFULLY_CHANGED,
+                    successKey: "SUCCESS.PASSWORD_SUCCESSFULLY_CHANGED"
+                }
+            }
+            res.status(200).send(success);
+        })
+    })
+
     /*********************
     * ACCOUNTS ROUTES ****
     **********************/
@@ -258,11 +296,13 @@ module.exports = function(app){
                     id: accounts[i]._id,
                     groupId: accounts[i].groupId,
                     name: accounts[i].name,
-                    image: accounts[i].image,
                     description: accounts[i].description,
                     user: accounts[i].user,
                     password: accounts[i].password,
-                    index: accounts[i].index
+                    index: accounts[i].index,
+                    imageUrl: accounts[i].image.imageUrl,
+                    imageDomain: accounts[i].image.imageDomain,
+                    imageName: accounts[i].image.imageName
                 }
             }
             var responseReturn = {
@@ -289,11 +329,13 @@ module.exports = function(app){
                     id: account.id,
                     groupId: account.groupId,
                     name: account.name,
-                    image: account.image,
                     description: account.description,
                     user: account.user,
                     password: account.password,
-                    index: account.index
+                    index: account.index,
+                    imageUrl: account.image.imageUrl,
+                    imageDomain: account.image.imageDomain,
+                    imageName: account.image.imageName
                 }
             }
             res.status(200).send(responseReturn);
@@ -320,11 +362,13 @@ module.exports = function(app){
                     id: account._id,
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index: account.index
+                    index: account.index,
+                    imageUrl: account.image.imageUrl,
+                    imageDomain: account.image.imageDomain,
+                    imageName: account.image.imageName
                 }
             }
             res.status(200).send(returnAccount);
@@ -350,11 +394,13 @@ module.exports = function(app){
                     id: account._id,
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index : account.index
+                    index : account.index,
+                    imageUrl: account.image.imageUrl,
+                    imageDomain: account.image.imageDomain,
+                    imageName: account.image.imageName
                 }
             }
             res.status(200).send(returnAccount);
@@ -380,11 +426,13 @@ module.exports = function(app){
                 data: {
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index: account.index
+                    index: account.index,
+                    imageUrl: account.image.imageUrl,
+                    imageDomain: account.image.imageDomain,
+                    imageName: account.image.imageName
                 }
             }
             res.status(200).send(returnAccount);
@@ -416,7 +464,9 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    image: group.image
+                    imageUrl: group.image.imageUrl,
+                    imageDomain: group.image.imageDomain,
+                    imageName: group.image.imageName
                 }
             }
             res.status(200).send(returnGroup);
@@ -440,8 +490,10 @@ module.exports = function(app){
                 },
                 data: {
                     name: group.name,
-                    image: group.image,
-                    index: group.index
+                    index: group.index,
+                    imageUrl: group.image.imageUrl,
+                    imageDomain: group.image.imageDomain,
+                    imageName: group.image.imageName
                 }
             }
             res.status(200).send(returnGroup);
@@ -467,7 +519,9 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    image: group.image
+                    imageUrl: group.image.imageUrl,
+                    imageDomain: group.image.imageDomain,
+                    imageName: group.image.imageName
                 }
             }
             res.status(200).send(returnGroup);
@@ -489,7 +543,9 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    image: group.image
+                    imageUrl: group.image.imageUrl,
+                    imageDomain: group.image.imageDomain,
+                    imageName: group.image.imageName
                 }
             }
             res.status(200).send(returnGroup);
@@ -513,7 +569,9 @@ module.exports = function(app){
                     id: groups[i]._id,
                     index: groups[i].index,
                     name: groups[i].name,
-                    image: groups[i].image
+                    imageUrl: group.image.imageUrl,
+                    imageDomain: group.image.imageDomain,
+                    imageName: group.image.imageName
                 }
             }
             var returnGroups = {
