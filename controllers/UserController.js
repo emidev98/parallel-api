@@ -126,6 +126,8 @@ module.exports.modifyUser = function(userId, user, callback){
             userDb.email = user.email;
         if (user.languages)
             userDb.language = user.language;
+        if (user.sendEmails)
+            userDb.sendEmails = user.sendEmails;
         if (user.styles){
             if (user.styles.image)
                 userDb.styles.image = user.styles.image;

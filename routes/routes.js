@@ -112,6 +112,7 @@ module.exports = function(app){
                     email: user.email,
                     password: user.password,
                     language: user.language,
+                    sendEmails: user.sendEmails,
                     styles: {
                         backgroundImage: user.styles.backgroundImage,
                         isGridView: user.styles.isGridView,
@@ -145,6 +146,7 @@ module.exports = function(app){
                     email: user.email,
                     password: user.password,
                     language: user.language,
+                    sendEmails: user.sendEmails,
                     styles: {
                         backgroundImage: user.styles.backgroundImage,
                         isGridView: user.styles.isGridView,
@@ -204,6 +206,7 @@ module.exports = function(app){
                     email : user.email,
                     password : user.password,
                     language : user.language,
+                    sendEmails: user.sendEmails,
                     styles: user.styles
                 }
             }
