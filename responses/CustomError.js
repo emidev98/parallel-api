@@ -57,6 +57,11 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.EMAIL_ALLREADY_CONFIRMED;
             this.errorKey = "ERRORS.EMAIL_ALLREADY_CONFIRMED";
             break;
+        case errorCodes.TOKEN_HAS_EXPIRED:
+            this.status = 401;
+            this.errorCode = errorCodes.TOKEN_HAS_EXPIRED;
+            this.errorKey = "ERRORS.TOKEN_HAS_EXPIRED";
+            break;
 
   }
 };
