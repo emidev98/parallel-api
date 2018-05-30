@@ -116,27 +116,15 @@ module.exports.modifyUser = function(userId, user, callback){
         if (!userDb){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        if (user.firstName)
-            userDb.firstName = user.firstName;
-        if (user.lastName)
-            userDb.lastName = user.lastName;
-        if (user.age)
-            userDb.age = user.age;
-        if (user.email)
-            userDb.email = user.email;
-        if (user.languages)
-            userDb.language = user.language;
-        if (user.sendEmails)
-            userDb.sendEmails = user.sendEmails;
-        if (user.styles){
-            if (user.styles.image)
-                userDb.styles.image = user.styles.image;
-            if (user.styles.backgroundImage)
-                userDb.styles.backgroundImage = user.styles.backgroundImage;
-            if (user.styles.isGridView)
-                userDb.styles.isGridView = user.styles.isGridView;
-        }
-
+        userDb.firstName = user.firstName;
+        userDb.lastName = user.lastName;
+        userDb.age = user.age;
+        userDb.email = user.email;
+        userDb.language = user.language;
+        userDb.sendEmails = user.sendEmails;
+        userDb.styles.image = user.styles.image;
+        userDb.styles.backgroundImage = user.styles.backgroundImage;
+        userDb.styles.isGridView = user.styles.isGridView;
         userDb.save(function(err, userSaved){
             if(err) {
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);

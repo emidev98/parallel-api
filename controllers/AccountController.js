@@ -201,42 +201,32 @@ module.exports.checkAccountModifications = function(userAccounts){
     var user = userAccounts[USER];
     return new Promise(function(resolve, reject){
         console.log("checking");
-        if (userAccounts[ACCOUNT_FRONT_END].groupId)
-            userAccounts[ACCOUNT_DB].groupId = userAccounts[ACCOUNT_FRONT_END].groupId;
-
-        if (userAccounts[ACCOUNT_FRONT_END].name)
-            userAccounts[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
-
-        if (userAccounts[ACCOUNT_FRONT_END].image)
-            userAccounts[ACCOUNT_DB].image = userAccounts[ACCOUNT_FRONT_END].image;
-
-        if (userAccounts[ACCOUNT_FRONT_END].description)
-            userAccounts[ACCOUNT_DB].description = userAccounts[ACCOUNT_FRONT_END].description;
-
-        if (userAccounts[ACCOUNT_FRONT_END].user)
-            userAccounts[ACCOUNT_DB].user = userAccounts[ACCOUNT_FRONT_END].user;
-
-        if (userAccounts[ACCOUNT_FRONT_END].password){
-            userAccounts[ACCOUNT_DB].password = userAccounts[ACCOUNT_FRONT_END].password;
-            var userAccount = {
-                userObj: user,
-                accountObj: userAccounts[ACCOUNT_DB]
-            }
-            AccountController.encryptAndSave(userAccount)
-            .then(savedAccount => resolve(savedAccount))
-            .catch(err => reject(err))
-
-        } else {
-            userAccounts[ACCOUNT_DB].save(function(err, savedAccount){
-                if (err){
-                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
-                }
-                CryptoUser.getPrivateKey(user._id)
-                .then(plaintext => AccountController.decryptPassoword(plaintext, savedAccount))
-                .then(accountWithPassword => resolve(accountWithPassword))
-                .catch(err => reject(err))
-            })
+        userAccounts[ACCOUNT_DB].groupId = userAccounts[ACCOUNT_FRONT_END].groupId;
+        userAccounts[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
+        userAccounts[ACCOUNT_DB].image = userAccounts[ACCOUNT_FRONT_END].image;
+        userAccounts[ACCOUNT_DB].description = userAccounts[ACCOUNT_FRONT_END].description;
+        userAccounts[ACCOUNT_DB].user = userAccounts[ACCOUNT_FRONT_END].user;
+    //    if (userAccounts[ACCOUNT_FRONT_END].password){
+        userAccounts[ACCOUNT_DB].password = userAccounts[ACCOUNT_FRONT_END].password;
+        var userAccount = {
+            userObj: user,
+            accountObj: userAccounts[ACCOUNT_DB]
         }
+        AccountController.encryptAndSave(userAccount)
+        .then(savedAccount => resolve(savedAccount))
+        .catch(err => reject(err))
+
+        // } else {
+        //     userAccounts[ACCOUNT_DB].save(function(err, savedAccount){
+        //         if (err){
+        //             return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+        //         }
+        //         CryptoUser.getPrivateKey(user._id)
+        //         .then(plaintext => AccountController.decryptPassoword(plaintext, savedAccount))
+        //         .then(accountWithPassword => resolve(accountWithPassword))
+        //         .catch(err => reject(err))
+        //     })
+        // }
     })
 }
 
