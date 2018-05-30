@@ -303,9 +303,7 @@ module.exports = function(app){
                     user: accounts[i].user,
                     password: accounts[i].password,
                     index: accounts[i].index,
-                    imageUrl: accounts[i].image.imageUrl,
-                    imageDomain: accounts[i].image.imageDomain,
-                    imageName: accounts[i].image.imageName
+                    image: accounts[i].image
                 }
             }
             var responseReturn = {
@@ -336,9 +334,7 @@ module.exports = function(app){
                     user: account.user,
                     password: account.password,
                     index: account.index,
-                    imageUrl: account.image.imageUrl,
-                    imageDomain: account.image.imageDomain,
-                    imageName: account.image.imageName
+                    image: account.image
                 }
             }
             res.status(200).send(responseReturn);
@@ -369,9 +365,7 @@ module.exports = function(app){
                     user : account.user,
                     password : account.password,
                     index: account.index,
-                    imageUrl: account.image.imageUrl,
-                    imageDomain: account.image.imageDomain,
-                    imageName: account.image.imageName
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
@@ -401,9 +395,7 @@ module.exports = function(app){
                     user : account.user,
                     password : account.password,
                     index : account.index,
-                    imageUrl: account.image.imageUrl,
-                    imageDomain: account.image.imageDomain,
-                    imageName: account.image.imageName
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
@@ -434,9 +426,7 @@ module.exports = function(app){
                     user : account.user,
                     password : account.password,
                     index: account.index,
-                    imageUrl: account.image.imageUrl,
-                    imageDomain: account.image.imageDomain,
-                    imageName: account.image.imageName
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
