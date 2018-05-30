@@ -458,9 +458,11 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    image: group.image
+                    image: group.image,
+                    accounts: group.accounts
                 }
             }
+            console.log("created account group");
             res.status(200).send(returnGroup);
         });
     });

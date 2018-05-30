@@ -28,16 +28,17 @@ module.exports.createGroup = function(userEmail, group, callback){
                 if (err){
                     return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                 }
-                accountGroup.accounts.forEach(account => {
-                    account.groupId = group.index;
+                group.accounts.forEach(account => {
+                    account.groupId = accountGroupSaved.index;
                     AccountController.createAccount(userEmail, account, function(err, savedAccount){
                         if (err){
-                            return callback(err, null)
+                            return callback(err, undefined)
                         }
                         accountsCreated++;
                         createdAccounts.push(savedAccount);
-                        if (accountsCreated.length == accountGroup.accounts.length){
-                            accountGroupSaved.accounts = accountsCreated;
+                        if (accountsCreated == group.accounts.length){
+                            accountGroupSaved.accounts = createdAccounts;
+                            console.log(accountGroupSaved);
                             return callback(null, accountGroupSaved);
                         }
                     })
