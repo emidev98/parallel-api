@@ -301,9 +301,10 @@ module.exports.resetPassword = function(user, callback){
         if (Date.now() - userDb.recoveryDate > TIMEOUT){
             return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
         }
+        userDb.password = user.password;
         UserController.createHash(userDb)
-        .then(user => UserController.removeToken(user))
-        .then(userHashed => UserController.saveNewPassword(userDb, userHashed.password))
+        .then(userHashed => UserController.removeToken(userHashed))
+        .then(userWithoutToken => UserController.saveNewPassword(userWithoutToken, userWithoutToken.password))
         .then(userSaved => callback(null, userSaved))
         .catch(err => callback(err, undefined))
     })
