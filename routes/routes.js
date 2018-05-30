@@ -468,9 +468,7 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    imageUrl: group.image.imageUrl,
-                    imageDomain: group.image.imageDomain,
-                    imageName: group.image.imageName
+                    image: group.image
                 }
             }
             res.status(200).send(returnGroup);
@@ -495,9 +493,7 @@ module.exports = function(app){
                 data: {
                     name: group.name,
                     index: group.index,
-                    imageUrl: group.image.imageUrl,
-                    imageDomain: group.image.imageDomain,
-                    imageName: group.image.imageName
+                    image: group.image
                 }
             }
             res.status(200).send(returnGroup);
@@ -523,9 +519,7 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    imageUrl: group.image.imageUrl,
-                    imageDomain: group.image.imageDomain,
-                    imageName: group.image.imageName
+                    image: group.image
                 }
             }
             res.status(200).send(returnGroup);
@@ -547,9 +541,7 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    imageUrl: group.image.imageUrl,
-                    imageDomain: group.image.imageDomain,
-                    imageName: group.image.imageName
+                    image: group.image
                 }
             }
             res.status(200).send(returnGroup);
@@ -573,9 +565,7 @@ module.exports = function(app){
                     id: groups[i]._id,
                     index: groups[i].index,
                     name: groups[i].name,
-                    imageUrl: groups[i].image.imageUrl,
-                    imageDomain: groups[i].image.imageDomain,
-                    imageName: groups[i].image.imageName
+                    image: groups[i].image
                 }
             }
             var returnGroups = {
