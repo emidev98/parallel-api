@@ -6,8 +6,12 @@ var ObjectId  = mongoose.Schema.Types.ObjectId;
 var AccountGroupsSchema = new Schema({
     index: Number,
     userId: ObjectId,
-    image: String,
-    name: String
+    name: String,
+    image: {
+        imageUrl: String,
+        imageDomain: String,
+        imageName: String,
+    },
 }, {collection: "accountgroups"});
 
 module.exports = conn.model('AccountGroup', AccountGroupsSchema);
