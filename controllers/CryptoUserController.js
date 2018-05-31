@@ -61,3 +61,16 @@ module.exports.getPrivateKey = function(userId){
         });
     });
 }
+
+module.exports.deletePrivateKey = function(deletedUserId){
+    return new Promise(function(resolve, reject){
+        CryptoUser.deleteOne({
+            userId: deletedUserId
+        }, function(err, deletedPrivKey){
+            if(err){
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+            }
+            resolve();
+        })
+    })
+}
