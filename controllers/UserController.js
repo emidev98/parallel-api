@@ -37,7 +37,7 @@ module.exports.isLogged = function(tokenString, emailString, callback){
     })
 }
 
-module.exports.verifyGoogleAccount = function(token){
+module.exports.verifyGoogleAccount = async function(token){
     return new Promise(function(resolve, reject){
         const ticket = await client.verifyIdToken({
             idToken: token,
@@ -53,7 +53,7 @@ module.exports.verifyGoogleAccount = function(token){
 module.exports.googleSignIn = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
-    verify(user.id).then(userid => function(userid){
+    verifyGoogleAccount(user.id).then(userid => function(userid){
         console.log(userid);
         User.findOne({
             email: user.email
