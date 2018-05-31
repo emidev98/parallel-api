@@ -27,7 +27,7 @@ module.exports = function(app){
     * USERS ROUTES ****
     ******************/
 
-    app.put('/google-sign-in', function(req, res) {
+    app.post('/google-sign-in', function(req, res) {
         User.googleSignIn(req.body, function(err, user){
             if(err){
                 console.log("1");
@@ -43,6 +43,7 @@ module.exports = function(app){
                 data: {
                     id : user._id,
                     token : authorization,
+                    isGoogle : true,
                 }
             }
             res.status(200).send(responseObject);
@@ -88,6 +89,7 @@ module.exports = function(app){
                 data: {
                     id : userDB._id,
                     token: authorization,
+                    isGoogle: false
                 }
             }
             res.status(200).send(returnUser);

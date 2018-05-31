@@ -13,7 +13,7 @@ var UsersSchema = new Schema({
     age: Number,
     password: String,
     language: {type: String, default: "ES"},
-    googleId: String,
+    isGoogle: {type: Boolean, default: false},
     emailConfirmed: {type: Boolean, default: false},
     sendEmails: {type: Boolean, default: true},
     recoveryToken: {type: String, default: ""},

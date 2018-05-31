@@ -11,9 +11,9 @@ var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
-var {OAuth2Client}        = require('google-auth-library');
-var CLIENT_ID             = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
-var client                = new OAuth2Client(CLIENT_ID);
+var {OAuth2Client}          = require('google-auth-library');
+var CLIENT_ID               = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
+var client                  = new OAuth2Client(CLIENT_ID);
 var UserController          = require('./UserController');
 var sgMail                  = require('@sendgrid/mail');
 var GroupController         = require('../controllers/GroupsController')
@@ -38,51 +38,48 @@ module.exports.isLogged = function(tokenString, emailString, callback){
 }
 
 async function verifyGoogleAccount(token){
-    return new Promise(function(resolve, reject){
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
-        const userid = payload['sub'];
-        console.log(userid);
-        resolve(userid);
-    })
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    console.log("user id in verify "+userid);
+    return userid;
 }
 
 module.exports.googleSignIn = function(user, callback){
     var USER = 0;
     var PRIVKEY = 1;
-    verifyGoogleAccount(user.id).then(userid => function(userid){
-        console.log(userid);
+    console.log(user);
+    verifyGoogleAccount(user.id).then(userid => {
+        console.log("userId in verified"+userid);
         User.findOne({
             email: user.email
         }, function(err, dbUser) {
+            console.log(user);
             if(err){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
             if(!dbUser){
-                console.log(user);
-                user.googleId = user.id;
-                user.styles = {
-                    image : user.image
-                }
-                UserController.createKeyPair(user)
+                var newUser = {
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    isGoogle: true,
+                    token: userid,
+                    emailConfirmed: true,
+                };
+                UserController.createKeyPair(newUser)
                 .then(resolveReturn => UserController.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
                 .then(savedUser => callback(null, savedUser))
                 .catch(err => callback(err, undefined))
             } else {
-                User.findOne({
-                    _id : user.id
-                }, function(err, idValidatedUser){
-                    if(err){
-                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                    }
-                    if(!idValidatedUser){
-        				return callback(new CustomError(errorCodes.DUPLICATED_USER), undefined);
-                    }
-                    callback(null, dbUser);
-                })
+                if(dbUser.isGoogle){
+                    return callback(null, dbUser);
+                } else {
+                    return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined);
+                }
             }
         })
     }).catch(console.error);
@@ -212,22 +209,25 @@ module.exports.deleteUser = function(userId, callback){
                 })
             } else {
                 var groupsProcessed = 0;
-                groups.forEach(group => {
-                    GroupController.deleteGroup(group._id, function(err, resGroup){
-                        if(err){
-                            return callback(err, undefined);
-                        }
-                        groupsProcessed++;
-                        if(groupsProcessed === groups.length){
-                            user.remove(function(err){
-                                if (err){
-                                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-                                }
-                                return callback(null, resUser);
-                            })
-                        }
-                    })
-                });
+                CryptoUserController.deletePrivateKey(resUser._id).then(() => {
+                    groups.forEach(group => {
+                        GroupController.deleteGroup(group._id, function(err, resGroup){
+                            if(err){
+                                return callback(err, undefined);
+                            }
+                            groupsProcessed++;
+                            if(groupsProcessed === groups.length){
+
+                                user.remove(function(err){
+                                    if (err){
+                                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                                    }
+                                    return callback(null, resUser);
+                                })
+                            }
+                        })
+                    });
+                }).catch(err => callback(err, undefined))
             }
         })
     })
@@ -360,7 +360,6 @@ module.exports.createKeyPair = function(user){
 			userIds: [{name: user.firstName, email: user.email}],
 			curve: "p256"
 		};
-        console.log(keyOption.userIds);
 		openpgp.generateKey(keyOption).then(function(key){
 			user.publicKey = key.publicKeyArmored;
 			var privkey = key.privateKeyArmored;
@@ -374,7 +373,9 @@ module.exports.createKeyPair = function(user){
 
 module.exports.saveNewUser = function(user, privkey){
 	return new Promise(function(resolve, reject) {
-        user.token = randtoken.generate(16);
+        if(!user.token){
+            user.token = randtoken.generate(16);
+        }
         user.styles = {
             backgroundImage : "",
             isGridView : true,
