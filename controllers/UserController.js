@@ -426,6 +426,9 @@ module.exports.checkUserEmail = function(user){
 			if (!userDB){
 				return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
 			}
+            if(userDb.isGoogle){
+                return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
+            }
 			var users = [user, userDB];
 			resolve(users);
 		})
