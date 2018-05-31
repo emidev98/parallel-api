@@ -183,7 +183,7 @@ module.exports = function(app){
 
     app.post('/user/change-password/:id', function(req, res){
         console.log("In routes");
-        User.changePassword(req.body, req.params.id, function(err, user){
+        User.changePassword(req.body, req.params.id, req.get('email'), function(err, user){
             if (err) {
                 console.log("7");
                 console.log(err)

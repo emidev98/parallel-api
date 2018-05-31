@@ -135,15 +135,16 @@ module.exports.modifyUser = function(userId, user, callback){
 
 
 
-module.exports.changePassword = function(requestBody, userId, callback){
+module.exports.changePassword = function(requestBody, userId, userEmail, callback){
     console.log("Im changind hash");
+    var newPassword = requestBody.newPassword;
+    var newPasswordRepeat = requestBody.newPasswordRepeat;
     var oldPassword = requestBody.actualPassword;
-    var oldPasswordRepeat = requestBody.actualPasswordRepeat;
-    if(oldPassword != oldPasswordRepeat){
+    if(newPassword != newPasswordRepeat){
         return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
     }
     User.findOne({
-        email: requestBody.email,
+        email: userEmail,
         _id: userId
     }, function(err, userInDb){
         if(err) {
@@ -151,11 +152,11 @@ module.exports.changePassword = function(requestBody, userId, callback){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         var oldPasswordUser = {
-            email: requestBody.email,
+            email: userEmail,
             password: requestBody.actualPassword,
         }
         var newPasswordUser = {
-            email: requestBody.email,
+            email: userEmail,
             password: requestBody.newPassword
         }
         var usersForHash = [oldPasswordUser, userInDb];
