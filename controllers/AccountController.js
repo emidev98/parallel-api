@@ -31,7 +31,7 @@ module.exports.createAccount = function(userEmail, account, callback){
                 description: account.description,
                 user: account.user,
                 password: account.password,
-                index: accountIndex
+                index: (accountIndex + 1)
             });
             var userAccount = {
                 userObj: user,
