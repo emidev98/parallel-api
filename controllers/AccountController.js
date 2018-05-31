@@ -22,7 +22,7 @@ module.exports.createAccount = function(userEmail, account, callback){
             groupId: account.groupId
         }).exec((err, accountIndex) => {
             if (!accountIndex)
-                accountIndex = 1;
+                accountIndex = 0;
             var newAccount = new Account({
                 userId: user._id,
                 groupId: account.groupId,
