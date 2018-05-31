@@ -11,9 +11,9 @@ var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
-const {OAuth2Client}        = require('google-auth-library');
-const client                = new OAuth2Client(CLIENT_ID);
-const CLIENT_ID             = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
+var {OAuth2Client}        = require('google-auth-library');
+var CLIENT_ID             = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
+var client                = new OAuth2Client(CLIENT_ID);
 var UserController          = require('./UserController');
 var sgMail                  = require('@sendgrid/mail');
 var GroupController         = require('../controllers/GroupsController')
@@ -37,7 +37,7 @@ module.exports.isLogged = function(tokenString, emailString, callback){
     })
 }
 
-module.exports.verifyGoogleAccount = async function(token){
+async function verifyGoogleAccount(token){
     return new Promise(function(resolve, reject){
         const ticket = await client.verifyIdToken({
             idToken: token,
