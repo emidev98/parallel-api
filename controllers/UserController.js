@@ -288,7 +288,7 @@ module.exports.resetPassword = function(user, callback){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND))
         }
         if (Date.now() - userDb.recoveryDate > TIMEOUT){
-            return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
+            return callback(new CustomError(errorCodes.TOKEN_HAS_EXPIRED), undefined)
         }
         userDb.password = user.password;
         UserController.createHash(userDb)
