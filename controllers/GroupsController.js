@@ -45,6 +45,7 @@ module.exports.createGroup = function(userEmail, group, callback){
                         })
                     })
                 }
+                callback(null, accountGroupSaved);
             });
         });
     });
