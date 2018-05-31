@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/eharastasan/paralelAPI#README",
   "dependencies": {
+    "@sendgrid/mail": "^6.2.1",
     "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",

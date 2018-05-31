@@ -18,7 +18,7 @@ module.exports = function CustomError(code) {
             this.errorKey = "ERRORS.INCORRECT_USER_OR_PASSWORD";
             break;
         case errorCodes.INCORRECT_TOKEN:
-            this.status = 500;
+            this.status = 401;
             this.errorCode = errorCodes.INCORRECT_TOKEN;
             this.errorKey = "ERRORS.INCORRECT_TOKEN";
             break;
@@ -42,6 +42,27 @@ module.exports = function CustomError(code) {
             this.errorCode = errorCodes.GROUP_NOT_FOUND;
             this.errorKey = "ERRORS.GROUP_NOT_FOUND";
             break;
+        case errorCodes.EMAIL_NOT_CONFIRMED:
+            this.status = 403;
+            this.errorCode = errorCodes.EMAIL_NOT_CONFIRMED;
+            this.errorKey = "ERRORS.EMAIL_NOT_CONFIRMED";
+            break;
+        case errorCodes.INCORRECT_REQUEST:
+            this.status = 411;
+            this.errorCode = errorCodes.INCORRECT_REQUEST;
+            this.errorKey = "ERRORS.INCORRECT_REQUEST";
+            break;
+        case errorCodes.EMAIL_ALLREADY_CONFIRMED:
+            this.status = 405;
+            this.errorCode = errorCodes.EMAIL_ALLREADY_CONFIRMED;
+            this.errorKey = "ERRORS.EMAIL_ALLREADY_CONFIRMED";
+            break;
+        case errorCodes.TOKEN_HAS_EXPIRED:
+            this.status = 401;
+            this.errorCode = errorCodes.TOKEN_HAS_EXPIRED;
+            this.errorKey = "ERRORS.TOKEN_HAS_EXPIRED";
+            break;
+
   }
 };
 

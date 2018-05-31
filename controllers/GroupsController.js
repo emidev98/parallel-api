@@ -1,9 +1,10 @@
-var express 	 = require('express');
-var openpgp      = require('openpgp');
-var User 		 = require('../models/User');
-var AccountGroup = require('../models/AccountGroup');
-var errorCodes   = require('../responses/errorCodes');
-var CustomError  = require('../responses/CustomError');
+var express 	      = require('express');
+var openpgp           = require('openpgp');
+var User 		      = require('../models/User');
+var AccountGroup      = require('../models/AccountGroup');
+var errorCodes        = require('../responses/errorCodes');
+var CustomError       = require('../responses/CustomError');
+var AccountController = require('../controllers/AccountController');
 
 module.exports.createGroup = function(userEmail, group, callback){
     User.findOne({
@@ -16,8 +17,10 @@ module.exports.createGroup = function(userEmail, group, callback){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         var accountGroup = new AccountGroup();
+        var createdAccounts = [];
+        var accountsCreated = 0;
         user.maxAccountGroupId(function(max){
-            accountGroup.index = max + 1;
+            accountGroup.index = max;
             accountGroup.userId = user._id;
             accountGroup.image = group.image;
             accountGroup.name = group.name;
@@ -25,7 +28,23 @@ module.exports.createGroup = function(userEmail, group, callback){
                 if (err){
                     return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
                 }
-                callback(null, accountGroupSaved);
+                if (group.accounts.length > 0){
+                    group.accounts.forEach(account => {
+                        account.groupId = accountGroupSaved.index;
+                        AccountController.createAccount(userEmail, account, function(err, savedAccount){
+                            if (err){
+                                return callback(err, undefined)
+                            }
+                            accountsCreated++;
+                            createdAccounts.push(savedAccount);
+                            if (accountsCreated == group.accounts.length){
+                                accountGroupSaved.accounts = createdAccounts;
+                                console.log(accountGroupSaved);
+                                return callback(null, accountGroupSaved);
+                            }
+                        })
+                    })
+                }
             });
         });
     });
@@ -66,11 +85,14 @@ module.exports.deleteGroup = function(groupId, callback){
             return callback(new CustomError(errorCodes.GROUP_NOT_FOUND), undefined);
         }
         resGroup = group;
-        group.remove(function(err){
-            if (err){
-                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
-            }
-            return callback(null, resGroup);
+        AccountController.deleteAccountsOnGroup(group)
+        .then(group => {
+            group.remove(function(err){
+                if (err){
+                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                }
+                return callback(null, resGroup);
+            })
         })
     })
 }

@@ -11,11 +11,12 @@ var CryptoUser 	            = require('../models/CryptoUser');
 var AccountGroup            = require('../models/AccountGroup');
 var mongoose                = require('mongoose');
 var saltRounds              = 10;
-var UserController          = require('./UserController')
 const {OAuth2Client}        = require('google-auth-library');
 const client                = new OAuth2Client(CLIENT_ID);
 const CLIENT_ID             = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com";
-
+var UserController          = require('./UserController');
+var sgMail                  = require('@sendgrid/mail');
+var GroupController         = require('../controllers/GroupsController')
 
 openpgp.initWorker({ path:'openpgp.worker.js' });
 
@@ -97,12 +98,14 @@ module.exports.register = function(user, callback){
     .then(user => this.createHash(user))
     .then(user => this.createKeyPair(user))
  	.then(resolveReturn => this.saveNewUser(resolveReturn[USER], resolveReturn[PRIVKEY]))
+    .then(savedUser => this.sendMail(savedUser))
     .then(savedUser => callback(null, savedUser))
     .catch(err => callback(err, undefined))
 }
 
 module.exports.login = function (user, callback){
 	this.checkUserEmail(user)
+        .then(users => this.checkEmailConfirmed(users))
 		.then(users => this.compareHash(users))
 		.then(userDB => callback(null, userDB))
 		.catch(err => callback(err, undefined))
@@ -132,25 +135,14 @@ module.exports.modifyUser = function(userId, user, callback){
         if (!userDb){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
-        if (user.image)
-            userDb.image = user.image;
-        if (user.firstName)
-            userDb.firstName = user.firstName;
-        if (user.lastName)
-            userDb.lastName = user.lastName;
-        if (user.age)
-            userDb.age = user.age;
-        if (user.email)
-            userDb.email = user.email;
-        if (user.languages)
-            userDb.language = user.language;
-        if (user.styles){
-            if (user.styles.backgroundImage)
-                userDb.styles.backgroundImage = user.styles.backgroundImage;
-            if (user.styles.isGridView)
-                userDb.styles.isGridView = user.styles.isGridView;
-        }
-
+        userDb.firstName = user.firstName;
+        userDb.lastName = user.lastName;
+        userDb.age = user.age;
+        userDb.language = user.language;
+        userDb.sendEmails = user.sendEmails;
+        userDb.styles.image = user.styles.image;
+        userDb.styles.backgroundImage = user.styles.backgroundImage;
+        userDb.styles.isGridView = user.styles.isGridView;
         userDb.save(function(err, userSaved){
             if(err) {
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
@@ -162,15 +154,16 @@ module.exports.modifyUser = function(userId, user, callback){
 
 
 
-module.exports.changePassword = function(requestBody, userId, callback){
+module.exports.changePassword = function(requestBody, userId, userEmail, callback){
     console.log("Im changind hash");
+    var newPassword = requestBody.newPassword;
+    var newPasswordRepeat = requestBody.newPasswordRepeat;
     var oldPassword = requestBody.actualPassword;
-    var oldPasswordRepeat = requestBody.actualPasswordRepeat;
-    if(oldPassword != oldPasswordRepeat){
+    if(newPassword != newPasswordRepeat){
         return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
     }
     User.findOne({
-        email: requestBody.email,
+        email: userEmail,
         _id: userId
     }, function(err, userInDb){
         if(err) {
@@ -178,11 +171,11 @@ module.exports.changePassword = function(requestBody, userId, callback){
             return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
         }
         var oldPasswordUser = {
-            email: requestBody.email,
+            email: userEmail,
             password: requestBody.actualPassword,
         }
         var newPasswordUser = {
-            email: requestBody.email,
+            email: userEmail,
             password: requestBody.newPassword
         }
         var usersForHash = [oldPasswordUser, userInDb];
@@ -206,17 +199,125 @@ module.exports.deleteUser = function(userId, callback){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
         }
         resUser = user;
-        user.remove(function(err){
-            if (err){
-                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        GroupController.findAll(resUser.email, function(err, groups){
+            if(err){
+                return callback(err, undefined);
             }
-            return callback(null, resUser);
+            if(groups.length === 0){
+                user.remove(function(err){
+                    if (err){
+                        return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                    }
+                    return callback(null, resUser);
+                })
+            } else {
+                var groupsProcessed = 0;
+                groups.forEach(group => {
+                    GroupController.deleteGroup(group._id, function(err, resGroup){
+                        if(err){
+                            return callback(err, undefined);
+                        }
+                        groupsProcessed++;
+                        if(groupsProcessed === groups.length){
+                            user.remove(function(err){
+                                if (err){
+                                    return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+                                }
+                                return callback(null, resUser);
+                            })
+                        }
+                    })
+                });
+            }
         })
     })
 }
 
+module.exports.confirmEmail = function(userId, callback){
+    if (userId.length != 24){
+        return callback(new CustomError(errorCodes.INCORRECT_REQUEST), undefined);
+    }
+    User.findOne({
+        _id: userId
+    }, function(err, user){
+        if (err){
+            console.log(err);
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND), undefined);
+        }
+        if (user.emailConfirmed){
+            return callback(new CustomError(errorCodes.EMAIL_ALLREADY_CONFIRMED), undefined);
+        }
+        user.emailConfirmed = true;
+        user.save(function(err, userSaved){
+            if (err){
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
+            }
+            callback(null, userSaved);
+        })
+    })
+}
 
+module.exports.sendMailResetPassword = function(userEmail, callback){
+    User.findOne({
+        email: userEmail
+    }, function (err, user){
+        if (err){
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+        }
+        if (!user){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND))
+        }
+        user.recoveryToken = randtoken.generate(16);
+        user.recoveryDate = Date.now();
+        user.save(function(err, savedUser){
+            if (err){
+                return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+            }
+            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            const msg = {
+              to: user.email,
+              from: 'no-reply@paralel.cf',
+              subject: 'Recuperar contraseña',
+              text: 'Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '. Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón.',
+              html: '<div style="font-size: 16px;">Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '.<br>Le informamos de que se ha solicitado un cambio de contraseña para este email, entre en el siguiente link e introduzca el codigo que le dejamos a continuacion: ' + savedUser.recoveryToken + '<br><br><a href="https://paralel.cf/reset-password/" style="display: grid; padding: 1em; background-color: #3f51b5; margin-top: 0.5em; color: white; text-decoration: none; align-items: center; width: 125px; text-align: center;">Cambiar contraseña</a></div>',
+            };
+            sgMail.send(msg);
+            callback(null);
+        })
+    })
+}
 
+module.exports.resetPassword = function(user, callback){
+    var TIMEOUT = 50000;
+    if (user.token.toString() == ""){
+        return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
+    }
+    if (user.password.toString() != user.repeatPassword.toString()){
+        return callback(new CustomError(errorCodes.PASSWORD_DO_NOT_MATCH), undefined);
+    }
+    User.findOne({
+        recoveryToken: user.token
+    }, function(err, userDb){
+        if (err){
+            return callback(new CustomError(errorCodes.INTERNAL_ERROR))
+        }
+        if (!userDb){
+            return callback(new CustomError(errorCodes.USER_NOT_FOUND))
+        }
+        if (Date.now() - userDb.recoveryDate > TIMEOUT){
+            return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
+        }
+        userDb.password = user.password;
+        UserController.createHash(userDb)
+        .then(userHashed => UserController.removeToken(userHashed))
+        .then(userWithoutToken => UserController.saveNewPassword(userWithoutToken, userWithoutToken.password))
+        .then(userSaved => callback(null, userSaved))
+        .catch(err => callback(err, undefined))
+    })
+}
 
     /**********************
     *PROMISES FUNCTIONS****
@@ -283,29 +384,34 @@ module.exports.saveNewUser = function(user, privkey){
 			if(err){
 				return reject(new CustomError(errorCodes.INTERNAL_ERROR));
 			}
-            var defaultAccountGroup = new AccountGroup({
-                index: -1,
+            var newCryptoUser = {
                 userId: savedUser._id,
-                image: "",
-                name: "Accounts"
+                privateKey: privkey,
+            }
+            CryptoUserController.saveCryptoUser(newCryptoUser)
+            .then(function(cryptoUser){
+                return resolve(savedUser);
+            }).catch(function(error){
+                return reject(error);
             });
-            defaultAccountGroup.save(function(err, accountGroup){
-                if (err){
-                    return reject(new CustomError(errorCodes.INTERNAL_ERROR));
-                }
-                var newCryptoUser = {
-    				userId: savedUser._id,
-    				privateKey: privkey,
-    			}
-                CryptoUserController.saveCryptoUser(newCryptoUser)
-                .then(function(cryptoUser){
-                    return resolve(savedUser);
-                }).catch(function(error){
-                    return reject(error);
-                });
-            });
+
 		});
 	});
+}
+
+module.exports.sendMail = function(user){
+    return new Promise(function(resolve, reject){
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const msg = {
+          to: user.email,
+          from: 'no-reply@paralel.cf',
+          subject: 'Email de confirmación',
+          text: 'Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '. Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón.',
+          html: '<div style="font-size: 16px;">Buenos dias Sr./Sra. ' + user.firstName + ' ' + user.lastName + '.<br>Le informamos que para poder usar la aplicación de Paralel necesitamos que confirmes tu dirección de email, haciendo click en el siguiente botón. <br><br><a href="https://paralel.cf/confirm-account/' + user._id + '" style="display: grid; padding: 1em; background-color: #3f51b5; margin-top: 0.5em; color: white; text-decoration: none; align-items: center; width: 125px; text-align: center;">Confirmar Email</a></div>',
+        };
+        sgMail.send(msg);
+        resolve(user);
+    })
 }
 
 module.exports.checkUserEmail = function(user){
@@ -323,6 +429,17 @@ module.exports.checkUserEmail = function(user){
 			resolve(users);
 		})
 	})
+}
+
+module.exports.checkEmailConfirmed = function(users){
+    var USER_DB = 1;
+    var user = users[USER_DB];
+    return new Promise(function(resolve, reject){
+        if (!user.emailConfirmed){
+            return reject(new CustomError(errorCodes.EMAIL_NOT_CONFIRMED))
+        }
+        resolve(users)
+    })
 }
 
 module.exports.compareHash = function(users){
@@ -355,6 +472,19 @@ module.exports.saveNewPassword = function(userInDb, newPassword) {
             }
             console.log("This is new user saved changed password: "+userSaved);
             resolve(userSaved);
+        })
+    })
+}
+
+module.exports.removeToken = function(user){
+    return new Promise(function(resolve, reject){
+        user.recoveryDate = null;
+        user.recoveryToken = "";
+        user.save(function(err){
+            if (err){
+                return reject(new CustomError(errorCodes.INTERNAL_ERROR));
+            }
+            resolve(user)
         })
     })
 }

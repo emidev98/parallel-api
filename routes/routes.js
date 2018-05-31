@@ -9,6 +9,8 @@ module.exports = function(app){
     var AccountGroup = require('../controllers/GroupsController');
     var Account      = require('../controllers/AccountController');
     var helloWorld   = require('../controllers/HelloWorldController');
+    var errorCodes   = require('../responses/errorCodes');
+    var CustomError  = require('../responses/CustomError');
 
     /******************
     * HELLOWORLD ROUTE*
@@ -51,22 +53,20 @@ module.exports = function(app){
         User.register(req.body, function(err, user){
             if(err){
                 console.log("2");
+                console.log(err);
                 var errorStatus = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
                 }
                 return res.status(err.status).send(errorStatus);
             }
-            var tokenmail = user.token+"|"+user.email;
-            var authorization = Buffer.from(tokenmail).toString('base64');
-            var responseObject = {
-                data: {
-                    id : user._id,
-                    token : authorization,
-                }
-            }
 
-            res.status(200).send(responseObject);
+            var confirmError = new CustomError(errorCodes.EMAIL_NOT_CONFIRMED);
+            var errorStatus = {
+                errorCode: confirmError.errorCode,
+                errorKey: confirmError.errorKey
+            }
+            return res.status(confirmError.status).send(errorStatus);
         });
     });
 
@@ -75,6 +75,7 @@ module.exports = function(app){
         User.login(req.body, function(err, userDB){
             if (err) {
                 console.log("3");
+                console.log(err);
                 var error = {
                     errorCode: err.errorCode,
                     errorKey: err.errorKey
@@ -111,6 +112,7 @@ module.exports = function(app){
                     email: user.email,
                     password: user.password,
                     language: user.language,
+                    sendEmails: user.sendEmails,
                     styles: {
                         backgroundImage: user.styles.backgroundImage,
                         isGridView: user.styles.isGridView,
@@ -144,6 +146,7 @@ module.exports = function(app){
                     email: user.email,
                     password: user.password,
                     language: user.language,
+                    sendEmails: user.sendEmails,
                     styles: {
                         backgroundImage: user.styles.backgroundImage,
                         isGridView: user.styles.isGridView,
@@ -180,7 +183,7 @@ module.exports = function(app){
 
     app.post('/user/change-password/:id', function(req, res){
         console.log("In routes");
-        User.changePassword(req.body, req.params.id, function(err, user){
+        User.changePassword(req.body, req.params.id, req.get('email'), function(err, user){
             if (err) {
                 console.log("7");
                 console.log(err)
@@ -203,10 +206,74 @@ module.exports = function(app){
                     email : user.email,
                     password : user.password,
                     language : user.language,
+                    sendEmails: user.sendEmails,
                     styles: user.styles
                 }
             }
             res.status(200).send(returnUser);
+        })
+    })
+
+    app.post('/confirm-account/:id', function(req, res){
+        User.confirmEmail(req.params.id, function(err, user){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var tokenmail = user.token+"|"+user.email;
+            var authorization = Buffer.from(tokenmail).toString('base64');
+            var returnUser = {
+                success: {
+                    successCode: successCodes.EMAIL_SUCCESSFULLY_CONFIRMED,
+                    successKey: "SUCCESS.EMAIL_SUCCESSFULLY_CONFIRMED"
+                },
+                data: {
+                    id: user._id,
+                    token: authorization
+                }
+            }
+            res.status(200).send(returnUser);
+        })
+    })
+
+    app.post('/send-reset-password-email', function(req, res){
+        User.sendMailResetPassword(req.body.email, function(err){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var success = {
+                success: {
+                    successCode: successCodes.MAIL_SUCCESSFULLY_SENDED,
+                    successKey: "SUCCESS.MAIL_SUCCESSFULLY_SENDED"
+                }
+            }
+            res.status(200).send(success);
+        })
+    })
+
+    app.post('/reset-password', function(req, res){
+        User.resetPassword(req.body, function(err){
+            if (err){
+                var error = {
+                    errorCode: err.errorCode,
+                    errorKey: err.errorKey
+                }
+                return res.status(err.status).send(error);
+            }
+            var success = {
+                success: {
+                    successCode: successCodes.PASSWORD_SUCCESSFULLY_CHANGED,
+                    successKey: "SUCCESS.PASSWORD_SUCCESSFULLY_CHANGED"
+                }
+            }
+            res.status(200).send(success);
         })
     })
 
@@ -232,11 +299,11 @@ module.exports = function(app){
                     id: accounts[i]._id,
                     groupId: accounts[i].groupId,
                     name: accounts[i].name,
-                    image: accounts[i].image,
                     description: accounts[i].description,
                     user: accounts[i].user,
                     password: accounts[i].password,
-                    index: accounts[i].index
+                    index: accounts[i].index,
+                    image: accounts[i].image
                 }
             }
             var responseReturn = {
@@ -259,7 +326,16 @@ module.exports = function(app){
                 return res.status(err.status).send(error);
             }
             var responseReturn = {
-                data : account
+                data : {
+                    id: account.id,
+                    groupId: account.groupId,
+                    name: account.name,
+                    description: account.description,
+                    user: account.user,
+                    password: account.password,
+                    index: account.index,
+                    image: account.image
+                }
             }
             res.status(200).send(responseReturn);
         })
@@ -285,11 +361,11 @@ module.exports = function(app){
                     id: account._id,
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index: account.index
+                    index: account.index,
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
@@ -315,11 +391,11 @@ module.exports = function(app){
                     id: account._id,
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index : account.index
+                    index : account.index,
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
@@ -343,13 +419,14 @@ module.exports = function(app){
                     successKey: "SUCCESS.ACCOUNT_SUCCESSFULLY_MODIFIED"
                 },
                 data: {
+                    id: account.id,
                     groupId: account.groupId,
                     name : account.name,
-                    image : account.image,
                     description : account.description,
                     user : account.user,
                     password : account.password,
-                    index: account.index
+                    index: account.index,
+                    image: account.image
                 }
             }
             res.status(200).send(returnAccount);
@@ -381,9 +458,11 @@ module.exports = function(app){
                     id: group._id,
                     index: group.index,
                     name: group.name,
-                    image: group.image
+                    image: group.image,
+                    accounts: group.accounts
                 }
             }
+            console.log("created account group");
             res.status(200).send(returnGroup);
         });
     });
@@ -405,8 +484,8 @@ module.exports = function(app){
                 },
                 data: {
                     name: group.name,
-                    image: group.image,
-                    index: group.index
+                    index: group.index,
+                    image: group.image
                 }
             }
             res.status(200).send(returnGroup);
@@ -472,8 +551,17 @@ module.exports = function(app){
                 }
                 return res.status(err.status).send(error);
             }
+            var returnGroups = [];
+            for (var i = 0; i < groups.length; i++){
+                returnGroups[i] = {
+                    id: groups[i]._id,
+                    index: groups[i].index,
+                    name: groups[i].name,
+                    image: groups[i].image
+                }
+            }
             var returnGroups = {
-                data: groups
+                data: returnGroups
             }
             res.status(200).send(returnGroups);
         })

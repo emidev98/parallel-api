@@ -14,6 +14,10 @@ var UsersSchema = new Schema({
     password: String,
     language: {type: String, default: "ES"},
     googleId: String,
+    emailConfirmed: {type: Boolean, default: false},
+    sendEmails: {type: Boolean, default: true},
+    recoveryToken: {type: String, default: ""},
+    recoveryDate: {type: Date, default: null},
     styles: {
         backgroundImage: {type: String, default: ""},
         isGridView: {type: Boolean, default: true},
@@ -31,8 +35,11 @@ UsersSchema.methods.maxAccountGroupId = function(callback) {
                 if (err){
     				return callback(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
+                if (!doc){
+                    return callback(1);
+                }
                 max = doc.index;
-                callback(max);
+                callback(max + 1);
             }
     );
 }
