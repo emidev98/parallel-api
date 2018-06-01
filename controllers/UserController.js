@@ -291,7 +291,7 @@ module.exports.sendMailResetPassword = function(userEmail, callback){
 }
 
 module.exports.resetPassword = function(user, callback){
-    var TIMEOUT = 50000;
+    var TIMEOUT = 600000;
     if (user.token.toString() == ""){
         return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined)
     }
@@ -426,7 +426,7 @@ module.exports.checkUserEmail = function(user){
 			if (!userDB){
 				return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
 			}
-            if(userDb.isGoogle){
+            if(userDB.isGoogle){
                 return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
             }
 			var users = [user, userDB];
