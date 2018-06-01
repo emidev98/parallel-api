@@ -115,6 +115,7 @@ module.exports = function(app){
                     password: user.password,
                     language: user.language,
                     sendEmails: user.sendEmails,
+                    isGoogle: user.isGoogle,
                     styles: {
                         backgroundImage: user.styles.backgroundImage,
                         isGridView: user.styles.isGridView,
