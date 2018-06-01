@@ -270,6 +270,9 @@ module.exports.sendMailResetPassword = function(userEmail, callback){
         if (!user){
             return callback(new CustomError(errorCodes.USER_NOT_FOUND))
         }
+        if(user.isGoogle){
+            return callback(new CustomError(errorCodes.INCORRECT_REQUEST))
+        }
         user.recoveryToken = randtoken.generate(16);
         user.recoveryDate = Date.now();
         user.save(function(err, savedUser){
@@ -427,7 +430,7 @@ module.exports.checkUserEmail = function(user){
 				return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
 			}
             if(userDB.isGoogle){
-                return reject(new CustomError(errorCodes.INCORRECT_USER_OR_PASSWORD));
+                return reject(new CustomError(errorCodes.INCORRECT_REQUEST));
             }
 			var users = [user, userDB];
 			resolve(users);
