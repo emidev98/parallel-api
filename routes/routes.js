@@ -486,6 +486,7 @@ module.exports = function(app){
                     successKey: "SUCCESS.GROUP_SUCCESSFULLY_MODIFIED"
                 },
                 data: {
+                    id: group._id,
                     name: group.name,
                     index: group.index,
                     image: group.image
