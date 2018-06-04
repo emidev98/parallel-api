@@ -28,8 +28,7 @@ module.exports = function(app){
     ******************/
 
     app.post('/google-sign-in', function(req, res) {
-        console.log(req.ip);
-        User.googleSignIn(req.body, function(err, user){
+        User.googleSignIn(req.body, req.get("Origin"), function(err, user){
             if(err){
                 console.log("1");
                 var errorStatus = {

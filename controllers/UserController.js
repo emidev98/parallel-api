@@ -13,6 +13,7 @@ var mongoose                = require('mongoose');
 var saltRounds              = 10;
 var {OAuth2Client}          = require('google-auth-library');
 var CLIENT_ID               = "380593198822-jhv13d5pnt19impr1791em8a9rs60o15.apps.googleusercontent.com";
+var CLIENT_ID_DEV           = "380593198822-a1r3c57rnqjfl8vij1chq3u3arlc4kao.apps.googleusercontent.com"
 var client                  = new OAuth2Client(CLIENT_ID);
 var UserController          = require('./UserController');
 var sgMail                  = require('@sendgrid/mail');
@@ -37,22 +38,31 @@ module.exports.isLogged = function(tokenString, emailString, callback){
     })
 }
 
-async function verifyGoogleAccount(token){
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,
-    });
+async function verifyGoogleAccount(token, origin){
+    var idToken;
+    if(origin == "https://paralel.cf"){
+        idToken = {
+            idToken: token,
+            audience: CLIENT_ID,
+        }
+    } else {
+        idToken = {
+            idToken: token,
+            audience: CLIENT_ID_DEV,
+        }
+    }
+    const ticket = await client.verifyIdToken(idToken);
     const payload = ticket.getPayload();
     const userid = payload['sub'];
     console.log("user id in verify "+userid);
     return userid;
 }
 
-module.exports.googleSignIn = function(user, callback){
+module.exports.googleSignIn = function(user, origin, callback){
     var USER = 0;
     var PRIVKEY = 1;
     console.log(user);
-    verifyGoogleAccount(user.id).then(userid => {
+    verifyGoogleAccount(user.id, origin).then(userid => {
         console.log("userId in verified"+userid);
         User.findOne({
             email: user.email
