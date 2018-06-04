@@ -150,10 +150,7 @@ module.exports.modifyAccount = function(userEmail, accountId, account, callback)
     **********************/
 
 module.exports.decryptPassoword = function(privkey, account){
-    console.log(privkey);
-    console.log(account);
     return new Promise(function(resolve, reject) {
-        console.log(openpgp.key.readArmored(privkey).keys);
         decryptOptions = {
             message: openpgp.message.readArmored(account.password),
             privateKeys: openpgp.key.readArmored(privkey).keys[0]
@@ -170,7 +167,6 @@ module.exports.decryptPassoword = function(privkey, account){
 
 module.exports.encryptAndSave = function(userAccount){
     return new Promise(function(resolve, reject){
-        console.log("encrypting");
         var user = userAccount.userObj;
         var account = userAccount.accountObj;
         var publicKey = user.publicKey;
@@ -186,7 +182,6 @@ module.exports.encryptAndSave = function(userAccount){
                 if (err){
                     return reject(new CustomError(errorCodes.INTERNAL_ERROR));
                 }
-                console.log("saved");
                 savedAccount.password = textPwd;
                 resolve(savedAccount);
             })
@@ -200,13 +195,11 @@ module.exports.checkAccountModifications = function(userAccounts){
     var USER = 2;
     var user = userAccounts[USER];
     return new Promise(function(resolve, reject){
-        console.log("checking");
         userAccounts[ACCOUNT_DB].groupId = userAccounts[ACCOUNT_FRONT_END].groupId;
         userAccounts[ACCOUNT_DB].name = userAccounts[ACCOUNT_FRONT_END].name;
         userAccounts[ACCOUNT_DB].image = userAccounts[ACCOUNT_FRONT_END].image;
         userAccounts[ACCOUNT_DB].description = userAccounts[ACCOUNT_FRONT_END].description;
         userAccounts[ACCOUNT_DB].user = userAccounts[ACCOUNT_FRONT_END].user;
-    //    if (userAccounts[ACCOUNT_FRONT_END].password){
         userAccounts[ACCOUNT_DB].password = userAccounts[ACCOUNT_FRONT_END].password;
         var userAccount = {
             userObj: user,
@@ -215,18 +208,6 @@ module.exports.checkAccountModifications = function(userAccounts){
         AccountController.encryptAndSave(userAccount)
         .then(savedAccount => resolve(savedAccount))
         .catch(err => reject(err))
-
-        // } else {
-        //     userAccounts[ACCOUNT_DB].save(function(err, savedAccount){
-        //         if (err){
-        //             return reject(new CustomError(errorCodes.INTERNAL_ERROR));
-        //         }
-        //         CryptoUser.getPrivateKey(user._id)
-        //         .then(plaintext => AccountController.decryptPassoword(plaintext, savedAccount))
-        //         .then(accountWithPassword => resolve(accountWithPassword))
-        //         .catch(err => reject(err))
-        //     })
-        // }
     })
 }
 

@@ -13,7 +13,6 @@ module.exports.replaceUrl = function(req, res, next){
 }
 
 module.exports.hasAccess = function(req, res, next){
-	console.log(req.url);
 	if(_.include(anonymousAllowedRoutes, req.url.substring(1, 5))){
 		req.url = req.url.replace(replaceUrlText[AUTH], "");
         next();

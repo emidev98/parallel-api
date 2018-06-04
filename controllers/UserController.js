@@ -33,7 +33,6 @@ module.exports.isLogged = function(tokenString, emailString, callback){
         if(user === null){
             return callback(new CustomError(errorCodes.INCORRECT_TOKEN), undefined);
         }
-        console.log("User is logged");
         callback(null, user);
     })
 }
@@ -54,20 +53,16 @@ async function verifyGoogleAccount(token, origin){
     const ticket = await client.verifyIdToken(idToken);
     const payload = ticket.getPayload();
     const userid = payload['sub'];
-    console.log("user id in verify "+userid);
     return userid;
 }
 
 module.exports.googleSignIn = function(user, origin, callback){
     var USER = 0;
     var PRIVKEY = 1;
-    console.log(user);
     verifyGoogleAccount(user.id, origin).then(userid => {
-        console.log("userId in verified"+userid);
         User.findOne({
             email: user.email
         }, function(err, dbUser) {
-            console.log(user);
             if(err){
                 return callback(new CustomError(errorCodes.INTERNAL_ERROR), undefined);
             }
@@ -162,7 +157,6 @@ module.exports.modifyUser = function(userId, user, callback){
 
 
 module.exports.changePassword = function(requestBody, userId, userEmail, callback){
-    console.log("Im changind hash");
     var newPassword = requestBody.newPassword;
     var newPasswordRepeat = requestBody.newPasswordRepeat;
     var oldPassword = requestBody.actualPassword;
@@ -353,7 +347,6 @@ module.exports.checkNewUserEmail = function(user){
 }
 
 module.exports.createHash = function(user){
-    console.log("Im creating hash");
 	return new Promise(function(resolve, reject) {
 		var plainHash = user.password + user.email.split("@", 1)[0];
 		bcrypt.hash(plainHash, saltRounds, function(err, hash){
@@ -460,8 +453,6 @@ module.exports.checkEmailConfirmed = function(users){
 }
 
 module.exports.compareHash = function(users){
-    console.log(users)
-    console.log("Im comparing hash");
 	var USER_FRONT_END = 0;
 	var USER_DB = 1;
 	return new Promise(function (resolve, reject){
@@ -479,7 +470,6 @@ module.exports.compareHash = function(users){
 }
 
 module.exports.saveNewPassword = function(userInDb, newPassword) {
-    console.log("Im saving user hash");
     return new Promise(function(resolve, reject){
         userInDb.password = newPassword;
         userInDb.save(function(err, userSaved){
@@ -487,7 +477,6 @@ module.exports.saveNewPassword = function(userInDb, newPassword) {
                 console.log(err);
                 return reject(new CustomError(errorCodes.INTERNAL_ERROR));
             }
-            console.log("This is new user saved changed password: "+userSaved);
             resolve(userSaved);
         })
     })
